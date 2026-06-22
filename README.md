@@ -14,5 +14,7 @@ Open `index.html` in any browser, or visit the published page on GitHub Pages.
 
 ## Publishing
 
-`index.html` lives at the repo root and is deployed to GitHub Pages on every push
-to `main` by `.github/workflows/deploy-pages.yml`.
+`index.html` lives at the repo root. To publish on GitHub Pages:
+Settings -> Pages -> Build and deployment -> Source: "Deploy from a branch" ->
+Branch: `main` / `/ (root)` -> Save. The site then serves at
+https://cayleywright.github.io/Love-quiz/
