@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 8 Love Expressions</title>
+<meta name="description" content="A lightweight take on the 8 Love Expressions framework. 40 quick statements, then see how you give and receive love. Nothing is saved.">
+<style>
+  :root {
+    --bg: #fbf7f4;
+    --card: #ffffff;
+    --ink: #2b2535;
+    --muted: #7a7185;
+    --line: #ece4ee;
+    --accent: #c25e7a;
+    --accent-soft: #f6e7ec;
+    --accent-deep: #9c4360;
+    --shadow: 0 10px 30px rgba(60, 40, 55, 0.08);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px 80px; }
+
+  header.hero {
+    text-align: center;
+    padding: 64px 20px 36px;
+  }
+  .hero .kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 14px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 46px);
+    line-height: 1.1;
+    margin: 0 0 16px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .hero p.lede {
+    max-width: 540px;
+    margin: 0 auto;
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  .progress-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(251, 247, 244, 0.92);
+    backdrop-filter: blur(8px);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .progress-inner {
+    max-width: 720px; margin: 0 auto; padding: 0 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .track { flex: 1; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.3s ease; }
+  .count { font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; min-width: 56px; text-align: right; }
+
+  .q {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 22px 18px;
+    margin: 16px 0;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s ease;
+  }
+  .q.answered { border-color: var(--accent-soft); }
+  .q .num { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  .q .text { font-size: 17px; font-weight: 600; margin: 6px 0 16px; }
+
+  .scale { display: flex; gap: 8px; }
+  .scale label {
+    flex: 1;
+    cursor: pointer;
+    text-align: center;
+  }
+  .scale input { position: absolute; opacity: 0; pointer-events: none; }
+  .scale .dot {
+    display: flex; align-items: center; justify-content: center;
+    height: 44px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--muted);
+    background: #fff;
+    transition: all 0.15s ease;
+  }
+  .scale label:hover .dot { border-color: var(--accent); color: var(--accent); }
+  .scale input:checked + .dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .scale-legend {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+    margin-top: 8px; letter-spacing: 0.02em;
+  }
+
+  .cta-zone { text-align: center; margin: 40px 0 8px; }
+  button.cta {
+    appearance: none; border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 18px; font-weight: 700;
+    padding: 16px 40px;
+    border-radius: 99px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, background 0.15s ease, opacity 0.2s ease;
+  }
+  button.cta:hover:not(:disabled) { background: var(--accent-deep); transform: translateY(-1px); }
+  button.cta:disabled { background: #d9cdd4; cursor: not-allowed; box-shadow: none; }
+  .helper { font-size: 14px; color: var(--muted); margin-top: 14px; min-height: 20px; }
+
+  footer.note {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Results */
+  #results { display: none; scroll-margin-top: 80px; }
+  #results.show { display: block; animation: rise 0.5s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .results-head { text-align: center; margin: 8px 0 28px; }
+  .results-head h2 { font-size: 30px; margin: 0 0 8px; font-weight: 800; }
+  .results-head p { color: var(--muted); margin: 0; }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 16px 0;
+    box-shadow: var(--shadow);
+  }
+  .panel h3 { margin: 0 0 4px; font-size: 20px; }
+  .panel .sub { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+
+  .top-list { list-style: none; margin: 0; padding: 0; }
+  .top-list li { margin-bottom: 16px; }
+  .top-list li:last-child { margin-bottom: 0; }
+  .row-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .row-head .name { font-weight: 700; font-size: 16px; }
+  .row-head .pct { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .meter { height: 10px; background: var(--accent-soft); border-radius: 99px; overflow: hidden; }
+  .meter span { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.6s ease; }
+  .row-desc { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+
+  .badge { display: inline-block; background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; font-size: 13px; padding: 4px 12px; border-radius: 99px; margin-bottom: 12px; }
+
+  .actions { text-align: center; margin: 28px 0; }
+  button.ghost {
+    appearance: none;
+    background: transparent;
+    border: 1.5px solid var(--line);
+    color: var(--muted);
+    font-weight: 700; font-size: 15px;
+    padding: 12px 26px;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  button.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .full-grid { list-style: none; margin: 0; padding: 0; }
+  .full-grid li { margin-bottom: 14px; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar">
+  <div class="progress-inner">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="count" id="count">0 / 40</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">A quick self-reflection</p>
+    <h1>The 8 Love Expressions</h1>
+    <p class="lede">40 quick statements. Rate how true each feels for you, then see how you give and receive love. Nothing is saved - it all stays on this page.</p>
+  </header>
+
+  <main id="quiz"></main>
+
+  <div class="cta-zone">
+    <button class="cta" id="seeResults" disabled>See my results</button>
+    <p class="helper" id="helper">Answer all 40 to unlock your results.</p>
+  </div>
+
+  <section id="results">
+    <div class="results-head">
+      <span class="badge" id="leadBadge"></span>
+      <h2>How you love</h2>
+      <p>Based on how true each statement felt for you.</p>
+    </div>
+
+    <div class="panel">
+      <h3>How you receive love</h3>
+      <p class="sub">The expressions that land most deeply when they come from others.</p>
+      <ul class="top-list" id="receiveList"></ul>
+    </div>
+
+    <div class="panel">
+      <h3>How you give love</h3>
+      <p class="sub">The ways you most naturally show people you care.</p>
+      <ul class="top-list" id="giveList"></ul>
+    </div>
+
+    <div class="panel">
+      <h3>All eight, side by side</h3>
+      <p class="sub">Your overall lean across every expression.</p>
+      <ul class="full-grid" id="fullList"></ul>
+    </div>
+
+    <div class="actions">
+      <button class="ghost" id="retake">Start over</button>
+    </div>
+  </section>
+
+  <footer class="note">
+    A lightweight take on the 8 Love Expressions framework. For reflection, not diagnosis.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // The eight expressions, with short reflective descriptions.
+  var EXPR = {
+    words:      { name: "Words of Affirmation", desc: "Spoken and written encouragement: being told, and telling others, that they matter." },
+    time:       { name: "Quality Time",         desc: "Undivided, unhurried attention as the truest sign of care." },
+    service:    { name: "Acts of Service",      desc: "Easing the load: practical help that says 'I've got you'." },
+    touch:      { name: "Physical Touch",       desc: "Closeness, a hand, a hug: connection through the body." },
+    gifts:      { name: "Thoughtful Gifts",     desc: "Small tokens that prove someone was held in mind." },
+    adventure:  { name: "Shared Adventure",     desc: "Bonding by doing, exploring and making memories together." },
+    attunement: { name: "Emotional Attunement", desc: "Feeling truly understood, heard and read without explaining." },
+    devotion:   { name: "Loyalty & Devotion",   desc: "Steadiness over time: showing up, keeping promises, standing by." }
+  };
+
+  // mode: "r" = how you like to RECEIVE love, "g" = how you GIVE love.
+  var STATEMENTS = [
+    { t: "Hearing “I'm proud of you” lands deeper for me than almost anything.", e: "words", m: "r" },
+    { t: "A heartfelt compliment can lift my whole day.", e: "words", m: "r" },
+    { t: "When I care about someone, I tell them exactly what I admire in them.", e: "words", m: "g" },
+    { t: "I leave little notes or messages just to say someone matters to me.", e: "words", m: "g" },
+    { t: "I replay kind words people have said to me long after.", e: "words", m: "r" },
+
+    { t: "I feel most loved when someone gives me their undivided attention.", e: "time", m: "r" },
+    { t: "I clear my schedule to be fully present for the people I love.", e: "time", m: "g" },
+    { t: "Uninterrupted time together means more to me than any gift.", e: "time", m: "r" },
+    { t: "I show I care by carving out one-on-one time, phone away.", e: "time", m: "g" },
+    { t: "A slow, unhurried catch-up refills me.", e: "time", m: "r" },
+
+    { t: "When someone handles a task so I don't have to, I feel cared for.", e: "service", m: "r" },
+    { t: "I show love by doing the practical things that make life easier for someone.", e: "service", m: "g" },
+    { t: "I notice what needs doing and quietly take care of it.", e: "service", m: "g" },
+    { t: "A partner remembering to do the thing I dread means a lot.", e: "service", m: "r" },
+    { t: "Helping out is how I say 'I've got you'.", e: "service", m: "g" },
+
+    { t: "A hug at the right moment settles me more than words.", e: "touch", m: "r" },
+    { t: "I reach for a hand or a shoulder to show I'm there.", e: "touch", m: "g" },
+    { t: "I crave physical closeness from the people I love.", e: "touch", m: "r" },
+    { t: "I'm usually the one who initiates hugs and casual touch.", e: "touch", m: "g" },
+    { t: "Sitting close, even in silence, makes me feel connected.", e: "touch", m: "r" },
+
+    { t: "A small, thoughtful gift tells me someone was thinking of me.", e: "gifts", m: "r" },
+    { t: "I love finding the perfect little something for someone.", e: "gifts", m: "g" },
+    { t: "It's not the price - a token that 'gets' me means everything.", e: "gifts", m: "r" },
+    { t: "I keep a mental list of things the people I love might want.", e: "gifts", m: "g" },
+    { t: "I bring back something small from trips for the people I care about.", e: "gifts", m: "g" },
+
+    { t: "I feel closest to someone when we're trying something new together.", e: "adventure", m: "r" },
+    { t: "I plan outings and experiences to share with people I love.", e: "adventure", m: "g" },
+    { t: "Shared adventures bond me to people faster than anything.", e: "adventure", m: "r" },
+    { t: "I pull people into spontaneous plans to make memories.", e: "adventure", m: "g" },
+    { t: "A day out exploring together recharges my connection.", e: "adventure", m: "r" },
+
+    { t: "I feel loved when someone gets what I'm feeling without me explaining.", e: "attunement", m: "r" },
+    { t: "I tune in closely to read how someone is really doing.", e: "attunement", m: "g" },
+    { t: "Being deeply listened to is the connection I crave most.", e: "attunement", m: "r" },
+    { t: "I ask the second question to understand what someone actually means.", e: "attunement", m: "g" },
+    { t: "I hold space for people to feel whatever they're feeling.", e: "attunement", m: "g" },
+
+    { t: "Knowing someone will show up no matter what makes me feel loved.", e: "devotion", m: "r" },
+    { t: "I show love by being steady and dependable, year after year.", e: "devotion", m: "g" },
+    { t: "Loyalty and consistency matter more to me than grand gestures.", e: "devotion", m: "r" },
+    { t: "I keep my promises to the people I love, even the small ones.", e: "devotion", m: "g" },
+    { t: "I feel secure when someone defends and stands by me.", e: "devotion", m: "r" }
+  ];
+
+  var TOTAL = STATEMENTS.length;
+  var answers = {}; // index -> 1..5
+
+  var quizEl = document.getElementById("quiz");
+  var fillEl = document.getElementById("fill");
+  var countEl = document.getElementById("count");
+  var btn = document.getElementById("seeResults");
+  var helper = document.getElementById("helper");
+  var resultsEl = document.getElementById("results");
+
+  var LEGEND = ["Not at all", "Very true"];
+
+  // Build the question cards.
+  STATEMENTS.forEach(function (s, i) {
+    var card = document.createElement("div");
+    card.className = "q";
+    card.id = "q" + i;
+
+    var scale = "";
+    for (var v = 1; v <= 5; v++) {
+      scale += '<label>' +
+        '<input type="radio" name="q' + i + '" value="' + v + '">' +
+        '<span class="dot">' + v + '</span>' +
+        '</label>';
+    }
+
+    card.innerHTML =
+      '<div class="num">' + (i + 1) + ' / ' + TOTAL + '</div>' +
+      '<div class="text">' + s.t + '</div>' +
+      '<div class="scale">' + scale + '</div>' +
+      '<div class="scale-legend"><span>' + LEGEND[0] + '</span><span>' + LEGEND[1] + '</span></div>';
+
+    quizEl.appendChild(card);
+
+    card.querySelectorAll('input[type=radio]').forEach(function (input) {
+      input.addEventListener("change", function () {
+        answers[i] = parseInt(this.value, 10);
+        card.classList.add("answered");
+        updateProgress();
+      });
+    });
+  });
+
+  function updateProgress() {
+    var done = Object.keys(answers).length;
+    var pct = Math.round((done / TOTAL) * 100);
+    fillEl.style.width = pct + "%";
+    countEl.textContent = done + " / " + TOTAL;
+    if (done === TOTAL) {
+      btn.disabled = false;
+      helper.textContent = "All done. Reveal your results whenever you're ready.";
+    } else {
+      btn.disabled = true;
+      helper.textContent = "Answer all 40 to unlock your results. (" + (TOTAL - done) + " to go)";
+    }
+  }
+
+  // Average rating per (expression, mode), normalised to a 0-100 percentage.
+  function scoreBy(mode) {
+    var sums = {}, counts = {};
+    Object.keys(EXPR).forEach(function (k) { sums[k] = 0; counts[k] = 0; });
+    STATEMENTS.forEach(function (s, i) {
+      if (s.m !== mode) return;
+      sums[s.e] += answers[i];
+      counts[s.e] += 1;
+    });
+    return Object.keys(EXPR).map(function (k) {
+      var avg = counts[k] ? sums[k] / counts[k] : 0;
+      return { key: k, pct: Math.round((avg / 5) * 100) };
+    }).sort(function (a, b) { return b.pct - a.pct; });
+  }
+
+  function renderTop(listEl, ranked, topN) {
+    listEl.innerHTML = "";
+    ranked.slice(0, topN).forEach(function (r) {
+      var li = document.createElement("li");
+      li.innerHTML =
+        '<div class="row-head"><span class="name">' + EXPR[r.key].name + '</span>' +
+        '<span class="pct">' + r.pct + '%</span></div>' +
+        '<div class="meter"><span style="width:' + r.pct + '%"></span></div>' +
+        '<p class="row-desc">' + EXPR[r.key].desc + '</p>';
+      listEl.appendChild(li);
+    });
+  }
+
+  function renderFull(listEl, combined) {
+    listEl.innerHTML = "";
+    combined.forEach(function (r) {
+      var li = document.createElement("li");
+      li.innerHTML =
+        '<div class="row-head"><span class="name">' + EXPR[r.key].name + '</span>' +
+        '<span class="pct">' + r.pct + '%</span></div>' +
+        '<div class="meter"><span style="width:' + r.pct + '%"></span></div>';
+      listEl.appendChild(li);
+    });
+  }
+
+  btn.addEventListener("click", function () {
+    if (Object.keys(answers).length !== TOTAL) return;
+
+    var receive = scoreBy("r");
+    var give = scoreBy("g");
+
+    // Combined overall lean across both modes.
+    var combinedMap = {};
+    Object.keys(EXPR).forEach(function (k) { combinedMap[k] = []; });
+    receive.concat(give).forEach(function (r) { combinedMap[r.key].push(r.pct); });
+    var combined = Object.keys(EXPR).map(function (k) {
+      var arr = combinedMap[k];
+      var avg = arr.reduce(function (a, b) { return a + b; }, 0) / arr.length;
+      return { key: k, pct: Math.round(avg) };
+    }).sort(function (a, b) { return b.pct - a.pct; });
+
+    document.getElementById("leadBadge").textContent = "Your strongest: " + EXPR[combined[0].key].name;
+
+    renderTop(document.getElementById("receiveList"), receive, 3);
+    renderTop(document.getElementById("giveList"), give, 3);
+    renderFull(document.getElementById("fullList"), combined);
+
+    resultsEl.classList.add("show");
+    resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("retake").addEventListener("click", function () {
+    answers = {};
+    resultsEl.classList.remove("show");
+    document.querySelectorAll('input[type=radio]').forEach(function (i) { i.checked = false; });
+    document.querySelectorAll('.q').forEach(function (c) { c.classList.remove("answered"); });
+    updateProgress();
+    document.querySelector("header.hero").scrollIntoView({ behavior: "smooth" });
+  });
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>
