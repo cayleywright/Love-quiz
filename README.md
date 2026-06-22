@@ -4,6 +4,9 @@ A lightweight, single-page self-reflection quiz. 40 quick statements, rated from
 "Not at all" to "Very true", then a read on how you give and receive love across
 eight expressions.
 
+The eight expressions: Nurturing Communication, Time Together, Actions, Thoughtful Gifts,
+Physical Affection, Emotional Connection, Intellectual Stimulation and Growth Support.
+
 Everything runs in the browser. Nothing is saved or sent - it all stays on the page.
 
 For reflection, not diagnosis.

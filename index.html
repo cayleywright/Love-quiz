@@ -189,6 +189,44 @@
 
   .full-grid { list-style: none; margin: 0; padding: 0; }
   .full-grid li { margin-bottom: 14px; }
+
+  details.exp {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: #fff;
+  }
+  details.exp > summary {
+    cursor: pointer;
+    padding: 14px 16px;
+    font-weight: 700;
+    font-size: 16px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  details.exp > summary::-webkit-details-marker { display: none; }
+  details.exp > summary .rank { color: var(--accent); font-size: 13px; font-weight: 700; }
+  details.exp > summary::after {
+    content: "+";
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1;
+    margin-left: auto;
+  }
+  details.exp[open] > summary::after { content: "\2013"; }
+  details.exp .body { padding: 0 16px 16px; }
+  details.exp .body p.exp-summary { margin: 0 0 14px; color: var(--ink); font-size: 14px; }
+  details.exp .body .ex-label {
+    font-size: 12px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 8px;
+  }
+  details.exp .body ul { margin: 0; padding-left: 18px; }
+  details.exp .body li { font-size: 14px; color: var(--muted); margin-bottom: 7px; }
 </style>
 </head>
 <body>
@@ -240,6 +278,12 @@
       <ul class="full-grid" id="fullList"></ul>
     </div>
 
+    <div class="panel">
+      <h3>Get to know your eight</h3>
+      <p class="sub">A short read on each expression, ordered by your lean, with practical ways to show it. Tap to open.</p>
+      <div id="detailList"></div>
+    </div>
+
     <div class="actions">
       <button class="ghost" id="retake">Start over</button>
     </div>
@@ -257,65 +301,145 @@
 
   // The eight expressions, with short reflective descriptions.
   var EXPR = {
-    words:      { name: "Words of Affirmation", desc: "Spoken and written encouragement: being told, and telling others, that they matter." },
-    time:       { name: "Quality Time",         desc: "Undivided, unhurried attention as the truest sign of care." },
-    service:    { name: "Acts of Service",      desc: "Easing the load: practical help that says 'I've got you'." },
-    touch:      { name: "Physical Touch",       desc: "Closeness, a hand, a hug: connection through the body." },
-    gifts:      { name: "Thoughtful Gifts",     desc: "Small tokens that prove someone was held in mind." },
-    adventure:  { name: "Shared Adventure",     desc: "Bonding by doing, exploring and making memories together." },
-    attunement: { name: "Emotional Attunement", desc: "Feeling truly understood, heard and read without explaining." },
-    devotion:   { name: "Loyalty & Devotion",   desc: "Steadiness over time: showing up, keeping promises, standing by." }
+    communication: {
+      name: "Nurturing Communication",
+      desc: "Heartfelt words, real conversation and shared humour: feeling close through how you talk and listen.",
+      summary: "Love reaches you through language. Being told clearly and specifically that you matter, having real, unhurried conversation, and sharing a bit of warmth and humour is what makes you feel close and understood.",
+      examples: [
+        "Offer a specific compliment, not a generic 'well done': name the exact thing you admire.",
+        "Leave a note or send a midday message just to say someone is on your mind.",
+        "Put the phone away and give one proper, unhurried conversation.",
+        "Keep things light with a shared joke, especially when the day has been heavy."
+      ]
+    },
+    time: {
+      name: "Time Together",
+      desc: "Quality time and shared experiences: being fully present in each other's company.",
+      summary: "Presence is the gift. Undistracted, unhurried time and shared experiences mean more to you than almost anything: it's about someone being fully there, not just in the same room.",
+      examples: [
+        "Block out time with no screens and nowhere else to be.",
+        "Suggest something new to do together, even something small.",
+        "Be fully present: phone down, properly listening.",
+        "Protect a regular ritual that belongs just to the two of you."
+      ]
+    },
+    actions: {
+      name: "Actions",
+      desc: "Practical help, devotion and quiet sacrifice: love shown through what you do.",
+      summary: "Actions speak loudest. Practical help, dependable follow-through and the willingness to go without so someone else doesn't have to is how love gets proven for you, more than any speech.",
+      examples: [
+        "Notice the task they are dreading and quietly take it off their plate.",
+        "Do the small everyday things without being asked.",
+        "Offer help before they have to ask for it.",
+        "Give up the comfortable option so someone you love can have it."
+      ]
+    },
+    gifts: {
+      name: "Thoughtful Gifts",
+      desc: "Considered gifts, surprises and generosity: tokens that prove you were held in mind.",
+      summary: "It's the thought, never the price. A well-chosen gift or small surprise, something that proves you were listening and held someone in mind, is what carries the meaning.",
+      examples: [
+        "Keep track of the little things they mention wanting.",
+        "Mark an ordinary day with a small, unexpected surprise.",
+        "Choose something personal that shows you really know them.",
+        "Quietly ease a worry, or treat them for no reason at all."
+      ]
+    },
+    touch: {
+      name: "Physical Affection",
+      desc: "Closeness and touch: reassurance and warmth through the body.",
+      summary: "Closeness reassures you. A hug, a hand, sitting near, contact can say what words can't, offering comfort, warmth and a felt sense of safety.",
+      examples: [
+        "Offer a hug or a hand when words won't quite cut it.",
+        "Sit close and lean in during quiet moments.",
+        "Be the one to initiate easy, everyday touch.",
+        "Use a comforting touch when someone is struggling."
+      ]
+    },
+    emotional: {
+      name: "Emotional Connection",
+      desc: "Trust, empathy and support: feeling deeply understood and safe to be yourself.",
+      summary: "You feel loved by being deeply understood. Trust, empathy, emotional safety and steady support, the freedom to come undone and know someone will stay, sit at the heart of it.",
+      examples: [
+        "Ask how they really are, and listen past the automatic 'I'm fine'.",
+        "Hold space for feelings without rushing to fix them.",
+        "Be honest, and let yourself be vulnerable too.",
+        "Show up steadily through the hard stretches, not just the good ones."
+      ]
+    },
+    intellectual: {
+      name: "Intellectual Stimulation",
+      desc: "Stimulating talk, shared learning and curiosity: connecting mind to mind.",
+      summary: "Minds meeting is its own intimacy. Conversations that make you think, learning side by side and genuine curiosity about how each other sees the world keep the connection alive.",
+      examples: [
+        "Start a conversation that genuinely makes them think.",
+        "Learn something new together: a book, a topic, a skill.",
+        "Be curious about their ideas and ask the deeper question.",
+        "Share the fascinating thing you just discovered."
+      ]
+    },
+    growth: {
+      name: "Growth Support",
+      desc: "Encouragement for your goals, health and growth: love that helps you become more yourself.",
+      summary: "Love, for you, helps people grow. Backing each other's goals, health and self-improvement, and standing by them through setbacks, is what makes it feel real.",
+      examples: [
+        "Champion their goals and celebrate the small wins.",
+        "Gently encourage their health and wellbeing.",
+        "Stay in their corner through setbacks, not just successes.",
+        "Make room and time for them to pursue what matters to them."
+      ]
+    }
   };
 
   // mode: "r" = how you like to RECEIVE love, "g" = how you GIVE love.
   var STATEMENTS = [
-    { t: "Few things land deeper than hearing 'I'm proud of you'.", e: "words", m: "r" },
-    { t: "One heartfelt compliment can turn my whole day around.", e: "words", m: "r" },
-    { t: "If I admire something in you, you'll hear about it from me.", e: "words", m: "g" },
-    { t: "Little notes and out-of-the-blue messages are my way of saying you matter.", e: "words", m: "g" },
-    { t: "Kind words said to me tend to echo around in my head for ages.", e: "words", m: "r" },
+    { t: "The right thing said at the right moment can stay with me for years.", e: "communication", m: "r" },
+    { t: "How someone speaks to me tends to linger long after the moment has passed.", e: "communication", m: "r" },
+    { t: "I'd rather be told plainly that I matter than be left to guess it.", e: "communication", m: "r" },
+    { t: "I make a point of naming the good I notice, rather than assuming people know.", e: "communication", m: "g" },
+    { t: "When someone I love is weighed down, my instinct is to lighten things a little.", e: "communication", m: "g" },
 
-    { t: "Nothing says love to me quite like someone's full, undivided attention.", e: "time", m: "r" },
-    { t: "For the people I love, I'll clear the calendar just to be fully present.", e: "time", m: "g" },
-    { t: "Uninterrupted time together beats any wrapped-up present.", e: "time", m: "r" },
-    { t: "Phone down, one on one: that's how I show up for someone.", e: "time", m: "g" },
-    { t: "A slow, unhurried catch-up leaves me refilled.", e: "time", m: "r" },
+    { t: "Half-attention bothers me far more than a plan falling through ever could.", e: "time", m: "r" },
+    { t: "My favourite kind of closeness is the unhurried, unscheduled sort.", e: "time", m: "r" },
+    { t: "Doing something for the first time, with someone, is what bonds me to them.", e: "time", m: "r" },
+    { t: "I'll quietly reshuffle my week to be properly available to someone.", e: "time", m: "g" },
+    { t: "When I'm with my person, the rest of the world can wait.", e: "time", m: "g" },
 
-    { t: "Someone quietly taking a job off my plate feels like being cared for.", e: "service", m: "r" },
-    { t: "To me, love often looks like the practical things that make your life easier.", e: "service", m: "g" },
-    { t: "If something needs doing, I tend to spot it and just handle it.", e: "service", m: "g" },
-    { t: "When a partner remembers the chore I dread, it means a lot.", e: "service", m: "r" },
-    { t: "'I've got you' usually comes out as me pitching in.", e: "service", m: "g" },
+    { t: "Being looked after in small, practical ways lands harder for me than being told I'm loved.", e: "actions", m: "r" },
+    { t: "When someone lifts a hassle off my day, I really feel it.", e: "actions", m: "r" },
+    { t: "I tend to notice what's quietly stressing someone and deal with it before they ask.", e: "actions", m: "g" },
+    { t: "I'd sooner prove I care by what I do than by what I say.", e: "actions", m: "g" },
+    { t: "Going without so someone I love doesn't have to comes naturally to me.", e: "actions", m: "g" },
 
-    { t: "A well-timed hug settles me faster than any pep talk.", e: "touch", m: "r" },
-    { t: "A hand on the shoulder is often how I let someone know I'm there.", e: "touch", m: "g" },
-    { t: "Physical closeness from the people I love is something I genuinely crave.", e: "touch", m: "r" },
-    { t: "Catch me being the first to go in for the hug.", e: "touch", m: "g" },
-    { t: "Even in silence, sitting close makes me feel connected.", e: "touch", m: "r" },
+    { t: "Being remembered in a small, tangible way undoes me a little.", e: "gifts", m: "r" },
+    { t: "What moves me is the noticing, not the spending.", e: "gifts", m: "r" },
+    { t: "I file away the little things people let slip that they'd love.", e: "gifts", m: "g" },
+    { t: "I like turning an ordinary day into a small occasion for someone.", e: "gifts", m: "g" },
+    { t: "Easing a worry, or surprising someone for no reason, is how I show up.", e: "gifts", m: "g" },
 
-    { t: "A small, thoughtful gift tells me I was on someone's mind.", e: "gifts", m: "r" },
-    { t: "Tracking down the perfect little something for someone is a thrill for me.", e: "gifts", m: "g" },
-    { t: "Price tag aside, a token that truly 'gets' me means the world.", e: "gifts", m: "r" },
-    { t: "There's a running list in my head of things my people might love.", e: "gifts", m: "g" },
-    { t: "I rarely come home from a trip without a little something for someone.", e: "gifts", m: "g" },
+    { t: "When I'm overwhelmed, nearness calms me faster than any advice.", e: "touch", m: "r" },
+    { t: "I feel safest when there's easy closeness rather than distance.", e: "touch", m: "r" },
+    { t: "Quiet contact reassures me more than reassuring words do.", e: "touch", m: "r" },
+    { t: "I reach out before I've found the words.", e: "touch", m: "g" },
+    { t: "I'm usually the one to close the gap: a lean, a hand, a brush of contact.", e: "touch", m: "g" },
 
-    { t: "Trying something new together is when I feel closest to a person.", e: "adventure", m: "r" },
-    { t: "Planning outings and experiences to share is a love language for me.", e: "adventure", m: "g" },
-    { t: "Nothing bonds me to someone faster than a shared adventure.", e: "adventure", m: "r" },
-    { t: "Spontaneous 'come on, let's go' plans? That's usually me.", e: "adventure", m: "g" },
-    { t: "A day out exploring together recharges how connected I feel.", e: "adventure", m: "r" },
+    { t: "Being understood before I've explained myself is what I quietly long for most.", e: "emotional", m: "r" },
+    { t: "Knowing I can fall apart and not be left is everything to me.", e: "emotional", m: "r" },
+    { t: "Feeling safe enough to be fully honest matters to me more than romance.", e: "emotional", m: "r" },
+    { t: "I tend to sense what's sitting underneath someone's 'I'm fine'.", e: "emotional", m: "g" },
+    { t: "I can stay with someone's feelings without needing to fix them.", e: "emotional", m: "g" },
 
-    { t: "Being understood without having to explain myself feels like love.", e: "attunement", m: "r" },
-    { t: "I read the room closely to catch how someone is really doing.", e: "attunement", m: "g" },
-    { t: "Of all forms of connection, being truly listened to is the one I crave.", e: "attunement", m: "r" },
-    { t: "I'm the one who asks the second question to get what you really mean.", e: "attunement", m: "g" },
-    { t: "Whatever someone is feeling, I try to hold space for it.", e: "attunement", m: "g" },
+    { t: "Someone who makes me think differently gets under my skin, in the best way.", e: "intellectual", m: "r" },
+    { t: "I feel known when someone is genuinely curious about how I see things.", e: "intellectual", m: "r" },
+    { t: "A question that unsettles my assumptions feels strangely intimate.", e: "intellectual", m: "r" },
+    { t: "Working an idea out together is one of my favourite kinds of closeness.", e: "intellectual", m: "g" },
+    { t: "When something fascinates me, I want to hand it straight to my people.", e: "intellectual", m: "g" },
 
-    { t: "Knowing someone will turn up no matter what is what love feels like.", e: "devotion", m: "r" },
-    { t: "Steady and dependable, year after year: that's how I love people.", e: "devotion", m: "g" },
-    { t: "Give me loyalty and consistency over grand gestures any day.", e: "devotion", m: "r" },
-    { t: "A promise to someone I love gets kept, right down to the small ones.", e: "devotion", m: "g" },
-    { t: "Having someone stand by me and defend me makes me feel secure.", e: "devotion", m: "r" }
+    { t: "I feel most loved by those who back who I'm becoming, not just who I am.", e: "growth", m: "r" },
+    { t: "Having someone truly on my side for my hopes and my health runs deep for me.", e: "growth", m: "r" },
+    { t: "I quietly push the people I love towards whatever they're reaching for.", e: "growth", m: "g" },
+    { t: "Other people's progress genuinely lights me up.", e: "growth", m: "g" },
+    { t: "I find myself nudging the people I love to look after themselves.", e: "growth", m: "g" }
   ];
 
   // Shuffle so the eight expressions aren't presented in grouped blocks
@@ -427,6 +551,26 @@
     });
   }
 
+  function renderDetails(listEl, combined) {
+    listEl.innerHTML = "";
+    combined.forEach(function (r, idx) {
+      var e = EXPR[r.key];
+      var items = e.examples.map(function (x) { return '<li>' + x + '</li>'; }).join("");
+      var det = document.createElement("details");
+      det.className = "exp";
+      if (idx === 0) det.open = true;
+      det.innerHTML =
+        '<summary><span class="name">' + e.name + '</span>' +
+        '<span class="rank">' + r.pct + '%</span></summary>' +
+        '<div class="body">' +
+        '<p class="exp-summary">' + e.summary + '</p>' +
+        '<p class="ex-label">Ways to show it</p>' +
+        '<ul>' + items + '</ul>' +
+        '</div>';
+      listEl.appendChild(det);
+    });
+  }
+
   btn.addEventListener("click", function () {
     if (Object.keys(answers).length !== TOTAL) return;
 
@@ -448,6 +592,7 @@
     renderTop(document.getElementById("receiveList"), receive, 3);
     renderTop(document.getElementById("giveList"), give, 3);
     renderFull(document.getElementById("fullList"), combined);
+    renderDetails(document.getElementById("detailList"), combined);
 
     resultsEl.classList.add("show");
     resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
