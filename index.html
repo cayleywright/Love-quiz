@@ -279,6 +279,17 @@
   .linkish { appearance: none; background: none; border: none; color: var(--accent); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 8px 0 0; text-decoration: underline; }
   #kidsResults { display: none; scroll-margin-top: 30px; }
   #kidsResults.show { display: block; animation: rise 0.5s ease; }
+
+  /* Tie-breaker */
+  .tiebreak-wrap { display: none; }
+  .tiebreak-wrap.show { display: block; animation: rise 0.4s ease; }
+  .tiebreak-intro { text-align: center; margin: 8px 0 18px; }
+  .tiebreak-intro h2 { font-size: 26px; margin: 0 0 6px; font-weight: 800; }
+  .tiebreak-intro p { color: var(--muted); margin: 0; }
+  .kq.tiebreak { border-color: var(--accent-soft); }
+  .kq.tiebreak .num { color: var(--accent-deep); }
+  .kbar-row.winner .kbar-name::after { content: " 👑"; }
+  .kbar-row.winner .kbar-track span { background: var(--accent-deep); }
 </style>
 </head>
 <body>
@@ -326,6 +337,8 @@
   </div>
 
   <section id="results">
+    <div id="adultTiebreak" class="tiebreak-wrap"></div>
+    <div id="adultResultsBody">
     <div class="results-head">
       <span class="badge" id="leadBadge"></span>
       <h2>How you love</h2>
@@ -359,6 +372,7 @@
     <div class="actions">
       <button class="ghost" id="retake">Start over</button>
     </div>
+    </div>
   </section>
 
   <footer class="note">
@@ -386,6 +400,8 @@
   </div>
 
   <section id="kidsResults">
+    <div id="kidsTiebreak" class="tiebreak-wrap"></div>
+    <div id="kidsResultsBody">
     <div class="results-head">
       <h2>Here's what you love</h2>
       <p>The ways you most like to be shown love.</p>
@@ -405,6 +421,7 @@
     <div class="actions">
       <button class="ghost" id="kidsRetake">Play again</button>
       <button class="ghost" id="kidsBack">Back to start</button>
+    </div>
     </div>
   </section>
 
@@ -433,6 +450,64 @@
   document.getElementById("chooseAdult").addEventListener("click", function () { showScreen("adult"); });
   document.getElementById("chooseKids").addEventListener("click", function () { showScreen("kids"); });
   document.getElementById("adultBack").addEventListener("click", function () { showScreen("chooser"); });
+
+  // Adaptive tie-breaker. When the top expressions are level, ask head-to-head
+  // "which would you pick" questions between just the tied ones, knockout style,
+  // until exactly one is left. optFor(key) -> { emoji, t }. Calls onDone(winner).
+  function runTiebreak(container, contenders, optFor, intro, stem, onDone) {
+    container.innerHTML = "";
+    container.classList.add("show");
+    var queue = contenders.slice();
+    function askNext() {
+      if (queue.length === 1) {
+        container.classList.remove("show");
+        container.innerHTML = "";
+        onDone(queue[0]);
+        return;
+      }
+      var aKey = queue.shift(), bKey = queue.shift();
+      var oa = optFor(aKey), ob = optFor(bKey);
+      container.innerHTML =
+        '<div class="tiebreak-intro"><h2>' + intro.title + '</h2><p>' + intro.sub + '</p></div>' +
+        '<div class="kq tiebreak">' +
+        '<div class="num">Tie-breaker</div>' +
+        '<div class="stem">' + stem + '</div>' +
+        '<div class="kopts">' +
+        '<button class="kopt" data-k="' + aKey + '"><span class="kemoji">' + oa.emoji + '</span><span class="ktext">' + oa.t + '</span></button>' +
+        '<button class="kopt" data-k="' + bKey + '"><span class="kemoji">' + ob.emoji + '</span><span class="ktext">' + ob.t + '</span></button>' +
+        '</div></div>';
+      container.querySelectorAll(".kopt").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          queue.push(this.getAttribute("data-k")); // winner stays in
+          askNext();
+        });
+      });
+      container.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    askNext();
+  }
+
+  // Representative head-to-head options per expression (concrete, one line each).
+  var TIE_ADULT = {
+    communication: { emoji: "💬", t: "Being told clearly that you're loved and appreciated" },
+    time:          { emoji: "⏰", t: "Real, undivided time together" },
+    actions:       { emoji: "🛠️", t: "Having things quietly taken off your plate" },
+    gifts:         { emoji: "🎁", t: "A thoughtful surprise that shows they get you" },
+    touch:         { emoji: "🤗", t: "Physical closeness and affection" },
+    emotional:     { emoji: "💗", t: "Feeling deeply understood and safe" },
+    intellectual:  { emoji: "🧠", t: "Conversations that really make you think" },
+    growth:        { emoji: "📣", t: "Someone backing your goals and growth" }
+  };
+  var TIE_KID = {
+    communication: { emoji: "💫", t: "Tell you you're amazing" },
+    time:          { emoji: "🎲", t: "Spend the whole day with you" },
+    actions:       { emoji: "🛠️", t: "Help you with anything you need" },
+    gifts:         { emoji: "🎁", t: "Surprise you with a present" },
+    touch:         { emoji: "🤗", t: "Give you a big hug" },
+    emotional:     { emoji: "👂", t: "Listen when you're sad" },
+    intellectual:  { emoji: "🧠", t: "Teach you cool things" },
+    growth:        { emoji: "📣", t: "Cheer you on" }
+  };
 
   // The eight expressions, with short reflective descriptions.
   var EXPR = {
@@ -706,6 +781,9 @@
     });
   }
 
+  var adultTiebreakEl = document.getElementById("adultTiebreak");
+  var adultBodyEl = document.getElementById("adultResultsBody");
+
   btn.addEventListener("click", function () {
     if (Object.keys(answers).length !== TOTAL) return;
 
@@ -722,24 +800,54 @@
       return { key: k, pct: Math.round(avg) };
     }).sort(function (a, b) { return b.pct - a.pct; });
 
-    document.getElementById("leadBadge").textContent = "Your strongest: " + EXPR[combined[0].key].name;
+    function finish(winnerKey) {
+      // Make the winner unambiguous: lift it to the front and ensure it sits
+      // strictly above the rest of the (previously tied) top.
+      var topPct = combined[0].pct;
+      combined.sort(function (a, b) {
+        if (a.key === winnerKey) return -1;
+        if (b.key === winnerKey) return 1;
+        return b.pct - a.pct;
+      });
+      if (combined.length > 1 && combined[0].pct <= combined[1].pct) {
+        combined[0] = { key: winnerKey, pct: Math.min(100, topPct + 1) };
+      }
 
-    renderTop(document.getElementById("receiveList"), receive, 3);
-    renderTop(document.getElementById("giveList"), give, 3);
-    renderFull(document.getElementById("fullList"), combined);
-    renderDetails(document.getElementById("detailList"), combined);
+      document.getElementById("leadBadge").textContent = "Your strongest: " + EXPR[winnerKey].name;
+      renderTop(document.getElementById("receiveList"), receive, 3);
+      renderTop(document.getElementById("giveList"), give, 3);
+      renderFull(document.getElementById("fullList"), combined);
+      renderDetails(document.getElementById("detailList"), combined);
+      adultBodyEl.style.display = "block";
+      resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
 
     resultsEl.classList.add("show");
-    resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    // Adaptive tie-breaker if the top is level.
+    var topPct = combined[0].pct;
+    var tied = combined.filter(function (c) { return c.pct === topPct; }).map(function (c) { return c.key; });
+    if (tied.length > 1) {
+      adultBodyEl.style.display = "none";
+      runTiebreak(adultTiebreakEl, tied, function (k) { return TIE_ADULT[k]; },
+        { title: "It's close - one tie-breaker", sub: "A few of your expressions came out level. Pick which means more." },
+        "Which means more to you?", finish);
+    } else {
+      adultBodyEl.style.display = "block";
+      finish(combined[0].key);
+    }
   });
 
   document.getElementById("retake").addEventListener("click", function () {
     answers = {};
     resultsEl.classList.remove("show");
+    adultTiebreakEl.classList.remove("show");
+    adultTiebreakEl.innerHTML = "";
+    adultBodyEl.style.display = "block";
     document.querySelectorAll('input[type=radio]').forEach(function (i) { i.checked = false; });
     document.querySelectorAll('.q').forEach(function (c) { c.classList.remove("answered"); });
     updateProgress();
-    document.querySelector("header.hero").scrollIntoView({ behavior: "smooth" });
+    adultAppEl.querySelector("header.hero").scrollIntoView({ behavior: "smooth" });
   });
 
   updateProgress();
@@ -816,30 +924,30 @@
     }
   }
 
-  kidsBtn.addEventListener("click", function () {
-    if (Object.keys(kidPicks).length !== KTOTAL) return;
+  var kidsTiebreakEl = document.getElementById("kidsTiebreak");
+  var kidsBodyEl = document.getElementById("kidsResultsBody");
 
-    var counts = {};
-    Object.keys(KID).forEach(function (k) { counts[k] = 0; });
-    Object.keys(kidPicks).forEach(function (i) { counts[kidPicks[i]] += 1; });
-
+  function renderKidsResults(counts, winnerKey) {
     var ranked = Object.keys(KID).map(function (k) {
       return { key: k, n: counts[k] };
-    }).sort(function (a, b) { return b.n - a.n; });
+    }).sort(function (a, b) {
+      if (a.key === winnerKey) return -1;
+      if (b.key === winnerKey) return 1;
+      return b.n - a.n;
+    });
 
-    var max = ranked[0].n || 1;
-    var win = ranked[0];
-    document.getElementById("kWinEmoji").textContent = KID[win.key].emoji;
-    document.getElementById("kWinName").textContent = KID[win.key].name;
+    var max = ranked.reduce(function (m, r) { return Math.max(m, r.n); }, 0) || 1;
+    document.getElementById("kWinEmoji").textContent = KID[winnerKey].emoji;
+    document.getElementById("kWinName").textContent = KID[winnerKey].name;
     document.getElementById("kWinLine").textContent =
-      "You love " + KID[win.key].name.toLowerCase() + " best!";
+      "You love " + KID[winnerKey].name.toLowerCase() + " best!";
 
     var barsEl = document.getElementById("kBars");
     barsEl.innerHTML = "";
     ranked.forEach(function (r) {
       var pct = Math.round((r.n / max) * 100);
       var row = document.createElement("div");
-      row.className = "kbar-row";
+      row.className = "kbar-row" + (r.key === winnerKey ? " winner" : "");
       row.innerHTML =
         '<div class="kbar-emoji">' + KID[r.key].emoji + '</div>' +
         '<div class="kbar-main">' +
@@ -850,13 +958,41 @@
       barsEl.appendChild(row);
     });
 
-    kidsResultsEl.classList.add("show");
+    kidsBodyEl.style.display = "block";
     kidsResultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  kidsBtn.addEventListener("click", function () {
+    if (Object.keys(kidPicks).length !== KTOTAL) return;
+
+    var counts = {};
+    Object.keys(KID).forEach(function (k) { counts[k] = 0; });
+    Object.keys(kidPicks).forEach(function (i) { counts[kidPicks[i]] += 1; });
+
+    var maxN = Object.keys(counts).reduce(function (m, k) { return Math.max(m, counts[k]); }, 0);
+    var tied = Object.keys(KID).filter(function (k) { return counts[k] === maxN; });
+
+    kidsResultsEl.classList.add("show");
+
+    if (tied.length > 1) {
+      kidsBodyEl.style.display = "none";
+      runTiebreak(kidsTiebreakEl, tied, function (k) { return TIE_KID[k]; },
+        { title: "So close! One more pick", sub: "A few were tied. Choose your favourite to find the winner." },
+        "Which would you pick?", function (winnerKey) {
+          renderKidsResults(counts, winnerKey);
+        });
+    } else {
+      kidsBodyEl.style.display = "block";
+      renderKidsResults(counts, tied[0]);
+    }
   });
 
   document.getElementById("kidsRetake").addEventListener("click", function () {
     kidPicks = {};
     kidsResultsEl.classList.remove("show");
+    kidsTiebreakEl.classList.remove("show");
+    kidsTiebreakEl.innerHTML = "";
+    kidsBodyEl.style.display = "block";
     document.querySelectorAll(".kopt").forEach(function (o) { o.classList.remove("sel"); });
     updateKidsProgress();
     kidsAppEl.querySelector("header.hero").scrollIntoView({ behavior: "smooth" });
