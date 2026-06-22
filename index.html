@@ -318,7 +318,19 @@
     { t: "I feel secure when someone defends and stands by me.", e: "devotion", m: "r" }
   ];
 
-  var TOTAL = STATEMENTS.length;
+  // Shuffle so the eight expressions aren't presented in grouped blocks
+  // (Fisher-Yates). Each item carries its own expression/mode tag, so order
+  // has no effect on scoring.
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  var ITEMS = shuffle(STATEMENTS.slice());
+
+  var TOTAL = ITEMS.length;
   var answers = {}; // index -> 1..5
 
   var quizEl = document.getElementById("quiz");
@@ -331,7 +343,7 @@
   var LEGEND = ["Not at all", "Very true"];
 
   // Build the question cards.
-  STATEMENTS.forEach(function (s, i) {
+  ITEMS.forEach(function (s, i) {
     var card = document.createElement("div");
     card.className = "q";
     card.id = "q" + i;
@@ -379,7 +391,7 @@
   function scoreBy(mode) {
     var sums = {}, counts = {};
     Object.keys(EXPR).forEach(function (k) { sums[k] = 0; counts[k] = 0; });
-    STATEMENTS.forEach(function (s, i) {
+    ITEMS.forEach(function (s, i) {
       if (s.m !== mode) return;
       sums[s.e] += answers[i];
       counts[s.e] += 1;
