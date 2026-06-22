@@ -1,8 +1,13 @@
 # The 8 Love Expressions
 
-A lightweight, single-page self-reflection quiz. 40 quick statements, rated from
-"Not at all" to "Very true", then a read on how you give and receive love across
-eight expressions.
+A lightweight, single-page self-reflection quiz. A start screen lets you choose
+between two versions:
+
+- **Grown-ups:** 40 statements, rated from "Not at all" to "Very true", then a
+  read on how you give and receive love across eight expressions.
+- **Kids:** 12 simple "would you rather your grown-up..." picks (a hug or a
+  chocolate, a bedtime story or a tidy room), then a friendly bar graph showing
+  what they love best.
 
 The eight expressions: Nurturing Communication, Time Together, Actions, Thoughtful Gifts,
 Physical Affection, Emotional Connection, Intellectual Stimulation and Growth Support.

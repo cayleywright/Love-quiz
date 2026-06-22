@@ -227,11 +227,83 @@
   }
   details.exp .body ul { margin: 0; padding-left: 18px; }
   details.exp .body li { font-size: 14px; color: var(--muted); margin-bottom: 7px; }
+
+  /* Chooser */
+  #chooser { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+  #chooser .kicker { text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; font-weight: 700; color: var(--accent); margin: 0 0 14px; }
+  #chooser h1 { font-size: clamp(32px, 6vw, 46px); line-height: 1.1; margin: 0 0 14px; font-weight: 800; letter-spacing: -0.01em; }
+  #chooser p.lede { max-width: 460px; margin: 0 auto 36px; font-size: 18px; color: var(--muted); }
+  .choose-grid { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 560px; }
+  .choose-card {
+    flex: 1 1 220px; background: var(--card); border: 1.5px solid var(--line); border-radius: 20px;
+    padding: 34px 24px; cursor: pointer; box-shadow: var(--shadow);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+    font-family: inherit; text-align: center;
+  }
+  .choose-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .choose-card .emoji { font-size: 46px; display: block; margin-bottom: 12px; }
+  .choose-card .label { font-size: 22px; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+  .choose-card .desc { font-size: 14px; color: var(--muted); }
+
+  /* Kids quiz */
+  .kq {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px; margin: 16px 0; box-shadow: var(--shadow);
+  }
+  .kq .num { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  .kq .stem { font-size: 19px; font-weight: 800; margin: 6px 0 18px; }
+  .kopts { display: flex; gap: 12px; }
+  .kopt {
+    flex: 1; background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+    padding: 20px 14px; cursor: pointer; font-family: inherit; text-align: center;
+    transition: all 0.15s ease; color: var(--ink);
+  }
+  .kopt:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .kopt.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .kopt .kemoji { font-size: 34px; display: block; margin-bottom: 8px; }
+  .kopt .ktext { font-size: 15px; font-weight: 700; line-height: 1.35; }
+  @media (max-width: 420px) { .kq .stem { font-size: 17px; } .kopt .ktext { font-size: 14px; } }
+
+  /* Kids results bar graph */
+  .kbar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .kbar-row .kbar-emoji { font-size: 26px; width: 34px; text-align: center; flex: none; }
+  .kbar-row .kbar-main { flex: 1; }
+  .kbar-row .kbar-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .kbar-row .kbar-name { font-weight: 800; font-size: 16px; }
+  .kbar-row .kbar-count { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .kbar-track { height: 16px; background: var(--accent-soft); border-radius: 99px; overflow: hidden; }
+  .kbar-track span { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.7s ease; }
+  .kbig { text-align: center; font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+  .kbig .kbig-emoji { font-size: 40px; display: block; margin-bottom: 8px; }
+
+  .linkish { appearance: none; background: none; border: none; color: var(--accent); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 8px 0 0; text-decoration: underline; }
+  #kidsResults { display: none; scroll-margin-top: 30px; }
+  #kidsResults.show { display: block; animation: rise 0.5s ease; }
 </style>
 </head>
 <body>
 
-<div class="progress-bar">
+<section id="chooser">
+  <p class="kicker">The 8 Love Expressions</p>
+  <h1>Who's taking the quiz?</h1>
+  <p class="lede">Pick the version that fits. Nothing is saved - it all stays on this page.</p>
+  <div class="choose-grid">
+    <button class="choose-card" id="chooseAdult">
+      <span class="emoji">💞</span>
+      <span class="label">Grown-ups</span>
+      <span class="desc">40 statements on how you give and receive love.</span>
+    </button>
+    <button class="choose-card" id="chooseKids">
+      <span class="emoji">🧸</span>
+      <span class="label">Kids</span>
+      <span class="desc">12 quick "would you rather" picks. Easy and fun.</span>
+    </button>
+  </div>
+</section>
+
+<div id="adultApp" style="display:none">
+
+<div class="progress-bar" id="progressBar">
   <div class="progress-inner">
     <div class="track"><div class="fill" id="fill"></div></div>
     <div class="count" id="count">0 / 40</div>
@@ -291,13 +363,76 @@
 
   <footer class="note">
     A lightweight take on the 8 Love Expressions framework. For reflection, not diagnosis.
+    <br><button class="linkish" id="adultBack">Back to start</button>
   </footer>
 
+</div>
+</div>
+
+<div id="kidsApp" style="display:none">
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">For kids</p>
+    <h1>Would You Rather?</h1>
+    <p class="lede">For each one, tap the thing you'd like best. There are no wrong answers!</p>
+  </header>
+
+  <main id="kidsQuiz"></main>
+
+  <div class="cta-zone">
+    <button class="cta" id="kidsSeeResults" disabled>See my answers</button>
+    <p class="helper" id="kidsHelper">Tap one for every question to see your results.</p>
+  </div>
+
+  <section id="kidsResults">
+    <div class="results-head">
+      <h2>Here's what you love</h2>
+      <p>The ways you most like to be shown love.</p>
+    </div>
+
+    <div class="panel">
+      <p class="kbig"><span class="kbig-emoji" id="kWinEmoji"></span><span id="kWinName"></span></p>
+      <p class="sub" style="text-align:center" id="kWinLine"></p>
+    </div>
+
+    <div class="panel">
+      <h3>All your picks</h3>
+      <p class="sub">How many times you chose each one.</p>
+      <div id="kBars"></div>
+    </div>
+
+    <div class="actions">
+      <button class="ghost" id="kidsRetake">Play again</button>
+      <button class="ghost" id="kidsBack">Back to start</button>
+    </div>
+  </section>
+
+  <footer class="note">
+    A lightweight take on the 8 Love Expressions framework. Just for fun.
+  </footer>
+
+</div>
 </div>
 
 <script>
 (function () {
   "use strict";
+
+  // ---- Screen chooser (grown-ups vs kids) ----
+  var chooserEl = document.getElementById("chooser");
+  var adultAppEl = document.getElementById("adultApp");
+  var kidsAppEl = document.getElementById("kidsApp");
+
+  function showScreen(which) {
+    chooserEl.style.display = which === "chooser" ? "flex" : "none";
+    adultAppEl.style.display = which === "adult" ? "block" : "none";
+    kidsAppEl.style.display = which === "kids" ? "block" : "none";
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("chooseAdult").addEventListener("click", function () { showScreen("adult"); });
+  document.getElementById("chooseKids").addEventListener("click", function () { showScreen("kids"); });
+  document.getElementById("adultBack").addEventListener("click", function () { showScreen("chooser"); });
 
   // The eight expressions, with short reflective descriptions.
   var EXPR = {
@@ -608,6 +743,130 @@
   });
 
   updateProgress();
+
+  // ================= KIDS QUIZ =================
+  // Kid-friendly names + emoji for each expression.
+  var KID = {
+    communication: { name: "Kind Words", emoji: "💬" },
+    time:          { name: "Time Together", emoji: "🎲" },
+    actions:       { name: "Helping You", emoji: "🛠️" },
+    gifts:         { name: "Treats & Surprises", emoji: "🎁" },
+    touch:         { name: "Hugs & Cuddles", emoji: "🤗" },
+    emotional:     { name: "Listening & Caring", emoji: "👂" },
+    intellectual:  { name: "Learning Together", emoji: "🧠" },
+    growth:        { name: "Cheering You On", emoji: "📣" }
+  };
+
+  // Forced-choice "would you rather your grown-up...". Each expression
+  // appears exactly 3 times across the 12 questions, so picks are fair.
+  var KIDQ = [
+    { a: { e: "touch",         emoji: "🤗", t: "Give you a big hug" },           b: { e: "gifts",        emoji: "🍫", t: "Buy you a chocolate" } },
+    { a: { e: "time",          emoji: "📖", t: "Read you a bedtime story" },     b: { e: "actions",      emoji: "🧹", t: "Tidy your room for you" } },
+    { a: { e: "communication", emoji: "🌟", t: "Tell you they're proud of you" }, b: { e: "intellectual", emoji: "🔬", t: "Teach you something cool" } },
+    { a: { e: "emotional",     emoji: "👂", t: "Listen when you're upset" },     b: { e: "growth",       emoji: "📣", t: "Cheer you on at your game" } },
+    { a: { e: "time",          emoji: "🎲", t: "Play your favourite game with you" }, b: { e: "touch",   emoji: "🛋️", t: "Have a cuddle on the couch" } },
+    { a: { e: "actions",       emoji: "🍝", t: "Make your favourite dinner" },   b: { e: "gifts",        emoji: "🎁", t: "Surprise you with a present" } },
+    { a: { e: "communication", emoji: "❤️", t: "Say 'I love you' lots" },        b: { e: "emotional",    emoji: "🗣️", t: "Ask all about your day" } },
+    { a: { e: "growth",        emoji: "🚲", t: "Help you learn to ride your bike" }, b: { e: "intellectual", emoji: "❓", t: "Answer your big questions" } },
+    { a: { e: "time",          emoji: "🛝", t: "Take you to the park" },         b: { e: "communication", emoji: "💫", t: "Tell you you're amazing" } },
+    { a: { e: "touch",         emoji: "😴", t: "Give you a goodnight kiss" },    b: { e: "actions",      emoji: "🔧", t: "Help you fix something" } },
+    { a: { e: "gifts",         emoji: "💌", t: "Leave a surprise note in your bag" }, b: { e: "intellectual", emoji: "🧩", t: "Show you how something works" } },
+    { a: { e: "growth",        emoji: "💪", t: "Say 'you can do it!' when it's hard" }, b: { e: "emotional", emoji: "🫂", t: "Give you a squeeze when you're sad" } }
+  ];
+
+  var kidsQuizEl = document.getElementById("kidsQuiz");
+  var kidsBtn = document.getElementById("kidsSeeResults");
+  var kidsHelper = document.getElementById("kidsHelper");
+  var kidsResultsEl = document.getElementById("kidsResults");
+  var KTOTAL = KIDQ.length;
+  var kidPicks = {}; // qIndex -> expression key
+
+  KIDQ.forEach(function (q, i) {
+    var card = document.createElement("div");
+    card.className = "kq";
+    card.id = "kq" + i;
+    card.innerHTML =
+      '<div class="num">' + (i + 1) + ' / ' + KTOTAL + '</div>' +
+      '<div class="stem">Would you rather your grown-up...</div>' +
+      '<div class="kopts">' +
+        '<button class="kopt" data-opt="a"><span class="kemoji">' + q.a.emoji + '</span><span class="ktext">' + q.a.t + '</span></button>' +
+        '<button class="kopt" data-opt="b"><span class="kemoji">' + q.b.emoji + '</span><span class="ktext">' + q.b.t + '</span></button>' +
+      '</div>';
+    kidsQuizEl.appendChild(card);
+
+    card.querySelectorAll(".kopt").forEach(function (optBtn) {
+      optBtn.addEventListener("click", function () {
+        var which = this.getAttribute("data-opt");
+        kidPicks[i] = q[which].e;
+        card.querySelectorAll(".kopt").forEach(function (o) { o.classList.remove("sel"); });
+        this.classList.add("sel");
+        updateKidsProgress();
+      });
+    });
+  });
+
+  function updateKidsProgress() {
+    var done = Object.keys(kidPicks).length;
+    if (done === KTOTAL) {
+      kidsBtn.disabled = false;
+      kidsHelper.textContent = "All done! Tap the button to see your results.";
+    } else {
+      kidsBtn.disabled = true;
+      kidsHelper.textContent = "Tap one for every question. (" + (KTOTAL - done) + " to go)";
+    }
+  }
+
+  kidsBtn.addEventListener("click", function () {
+    if (Object.keys(kidPicks).length !== KTOTAL) return;
+
+    var counts = {};
+    Object.keys(KID).forEach(function (k) { counts[k] = 0; });
+    Object.keys(kidPicks).forEach(function (i) { counts[kidPicks[i]] += 1; });
+
+    var ranked = Object.keys(KID).map(function (k) {
+      return { key: k, n: counts[k] };
+    }).sort(function (a, b) { return b.n - a.n; });
+
+    var max = ranked[0].n || 1;
+    var win = ranked[0];
+    document.getElementById("kWinEmoji").textContent = KID[win.key].emoji;
+    document.getElementById("kWinName").textContent = KID[win.key].name;
+    document.getElementById("kWinLine").textContent =
+      "You love " + KID[win.key].name.toLowerCase() + " best!";
+
+    var barsEl = document.getElementById("kBars");
+    barsEl.innerHTML = "";
+    ranked.forEach(function (r) {
+      var pct = Math.round((r.n / max) * 100);
+      var row = document.createElement("div");
+      row.className = "kbar-row";
+      row.innerHTML =
+        '<div class="kbar-emoji">' + KID[r.key].emoji + '</div>' +
+        '<div class="kbar-main">' +
+          '<div class="kbar-head"><span class="kbar-name">' + KID[r.key].name + '</span>' +
+          '<span class="kbar-count">' + r.n + '</span></div>' +
+          '<div class="kbar-track"><span style="width:' + pct + '%"></span></div>' +
+        '</div>';
+      barsEl.appendChild(row);
+    });
+
+    kidsResultsEl.classList.add("show");
+    kidsResultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("kidsRetake").addEventListener("click", function () {
+    kidPicks = {};
+    kidsResultsEl.classList.remove("show");
+    document.querySelectorAll(".kopt").forEach(function (o) { o.classList.remove("sel"); });
+    updateKidsProgress();
+    kidsAppEl.querySelector("header.hero").scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("kidsBack").addEventListener("click", function () {
+    showScreen("chooser");
+  });
+
+  updateKidsProgress();
 })();
 </script>
 </body>
