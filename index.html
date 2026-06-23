@@ -307,7 +307,7 @@
     <button class="choose-card" id="chooseKids">
       <span class="emoji">🧸</span>
       <span class="label">Kids</span>
-      <span class="desc">12 quick "would you rather" picks. Easy and fun.</span>
+      <span class="desc">30 quick "would you rather" picks. Easy and fun.</span>
     </button>
   </div>
 </section>
@@ -865,21 +865,39 @@
     growth:        { name: "Cheering You On", emoji: "📣" }
   };
 
-  // Forced-choice "would you rather your grown-up...". Each expression
-  // appears exactly 3 times across the 12 questions, so picks are fair.
+  // Forced-choice "would you rather your grown-up...". 30 questions; each
+  // expression appears 7-8 times across them, so picks stay fair.
   var KIDQ = [
-    { a: { e: "touch",         emoji: "🤗", t: "Give you a big hug" },           b: { e: "gifts",        emoji: "🍫", t: "Buy you a chocolate" } },
-    { a: { e: "time",          emoji: "📖", t: "Read you a bedtime story" },     b: { e: "actions",      emoji: "🧹", t: "Tidy your room for you" } },
-    { a: { e: "communication", emoji: "🌟", t: "Tell you they're proud of you" }, b: { e: "intellectual", emoji: "🔬", t: "Teach you something cool" } },
-    { a: { e: "emotional",     emoji: "👂", t: "Listen when you're upset" },     b: { e: "growth",       emoji: "📣", t: "Cheer you on at your game" } },
-    { a: { e: "time",          emoji: "🎲", t: "Play your favourite game with you" }, b: { e: "touch",   emoji: "🛋️", t: "Have a cuddle on the couch" } },
-    { a: { e: "actions",       emoji: "🍝", t: "Make your favourite dinner" },   b: { e: "gifts",        emoji: "🎁", t: "Surprise you with a present" } },
-    { a: { e: "communication", emoji: "❤️", t: "Say 'I love you' lots" },        b: { e: "emotional",    emoji: "🗣️", t: "Ask all about your day" } },
-    { a: { e: "growth",        emoji: "🚲", t: "Help you learn to ride your bike" }, b: { e: "intellectual", emoji: "❓", t: "Answer your big questions" } },
-    { a: { e: "time",          emoji: "🛝", t: "Take you to the park" },         b: { e: "communication", emoji: "💫", t: "Tell you you're amazing" } },
-    { a: { e: "touch",         emoji: "😴", t: "Give you a goodnight kiss" },    b: { e: "actions",      emoji: "🔧", t: "Help you fix something" } },
-    { a: { e: "gifts",         emoji: "💌", t: "Leave a surprise note in your bag" }, b: { e: "intellectual", emoji: "🧩", t: "Show you how something works" } },
-    { a: { e: "growth",        emoji: "💪", t: "Say 'you can do it!' when it's hard" }, b: { e: "emotional", emoji: "🫂", t: "Give you a squeeze when you're sad" } }
+    { a: { e: "touch",         emoji: "🤗", t: "Give you a big hug" },                  b: { e: "gifts",        emoji: "🍫", t: "Buy you a chocolate" } },
+    { a: { e: "time",          emoji: "🎲", t: "Play your favourite game with you" },   b: { e: "actions",      emoji: "🧹", t: "Tidy your room for you" } },
+    { a: { e: "communication", emoji: "🌟", t: "Tell you they're proud of you" },       b: { e: "intellectual", emoji: "🔬", t: "Teach you something cool" } },
+    { a: { e: "emotional",     emoji: "👂", t: "Listen when you're upset" },            b: { e: "growth",       emoji: "📣", t: "Cheer you on at your game" } },
+    { a: { e: "time",          emoji: "🛝", t: "Take you to the park" },                b: { e: "touch",        emoji: "🛋️", t: "Have a cuddle on the couch" } },
+    { a: { e: "actions",       emoji: "🍝", t: "Make your favourite dinner" },          b: { e: "gifts",        emoji: "🎁", t: "Surprise you with a present" } },
+    { a: { e: "communication", emoji: "❤️", t: "Say 'I love you'" },                    b: { e: "emotional",    emoji: "🗣️", t: "Ask all about your day" } },
+    { a: { e: "growth",        emoji: "💪", t: "Say 'you can do it!' when it's hard" }, b: { e: "intellectual", emoji: "❓", t: "Answer your big questions" } },
+    { a: { e: "time",          emoji: "🌞", t: "Spend the whole day with you" },        b: { e: "communication", emoji: "💫", t: "Tell you you're amazing" } },
+    { a: { e: "touch",         emoji: "😴", t: "Give you a goodnight kiss" },           b: { e: "actions",      emoji: "🔧", t: "Fix your broken toy" } },
+    { a: { e: "gifts",         emoji: "💌", t: "Leave a surprise note in your bag" },   b: { e: "intellectual", emoji: "🧩", t: "Show you how something works" } },
+    { a: { e: "growth",        emoji: "⚽", t: "Practise with you so you get better" }, b: { e: "emotional",    emoji: "🫂", t: "Give you a squeeze when you're sad" } },
+    { a: { e: "touch",         emoji: "🐴", t: "Give you a piggyback ride" },           b: { e: "time",         emoji: "🍿", t: "Watch a movie together" } },
+    { a: { e: "communication", emoji: "👏", t: "Tell you you did a great job" },        b: { e: "gifts",        emoji: "🍦", t: "Get you an ice cream" } },
+    { a: { e: "actions",       emoji: "🎒", t: "Pack your school bag for you" },        b: { e: "growth",       emoji: "🌱", t: "Tell you to keep trying" } },
+    { a: { e: "intellectual",  emoji: "📚", t: "Read a fact book with you" },           b: { e: "touch",        emoji: "🤝", t: "Hold your hand" } },
+    { a: { e: "emotional",     emoji: "🌙", t: "Sit with you when you're scared" },     b: { e: "time",         emoji: "🏰", t: "Build a fort together" } },
+    { a: { e: "gifts",         emoji: "🧸", t: "Bring you a little toy" },              b: { e: "communication", emoji: "🥰", t: "Tell you you're their favourite" } },
+    { a: { e: "growth",        emoji: "🎯", t: "Help you reach a goal" },               b: { e: "touch",        emoji: "🛏️", t: "Tuck you in tight" } },
+    { a: { e: "intellectual",  emoji: "🧠", t: "Do a tricky puzzle with you" },         b: { e: "actions",      emoji: "✏️", t: "Help you with your homework" } },
+    { a: { e: "time",          emoji: "🧁", t: "Bake something together" },             b: { e: "emotional",    emoji: "💗", t: "Listen to how you're feeling" } },
+    { a: { e: "touch",         emoji: "🙌", t: "Do a high five and a big squeeze" },    b: { e: "gifts",        emoji: "🎈", t: "Give you a balloon" } },
+    { a: { e: "communication", emoji: "💞", t: "Tell you you're loved" },              b: { e: "growth",       emoji: "🔥", t: "Tell you to never give up" } },
+    { a: { e: "intellectual",  emoji: "🌈", t: "Explain why the sky is blue" },         b: { e: "time",         emoji: "🗺️", t: "Go on an adventure together" } },
+    { a: { e: "actions",       emoji: "🍎", t: "Make you a yummy snack" },              b: { e: "touch",        emoji: "🐻", t: "Give you a big bear hug" } },
+    { a: { e: "emotional",     emoji: "🤍", t: "Help you when you're worried" },        b: { e: "communication", emoji: "😊", t: "Say something kind to you" } },
+    { a: { e: "growth",        emoji: "🎉", t: "Be your biggest fan" },                 b: { e: "gifts",        emoji: "🍪", t: "Bring home a treat just for you" } },
+    { a: { e: "intellectual",  emoji: "✨", t: "Help you learn something new" },        b: { e: "emotional",    emoji: "🩹", t: "Make you feel better" } },
+    { a: { e: "time",          emoji: "🚲", t: "Ride bikes together" },                b: { e: "growth",       emoji: "🏆", t: "Help you get better at something" } },
+    { a: { e: "communication", emoji: "⭐", t: "Tell you you're special" },            b: { e: "actions",      emoji: "💼", t: "Carry your bag when you're tired" } }
   ];
 
   var kidsQuizEl = document.getElementById("kidsQuiz");

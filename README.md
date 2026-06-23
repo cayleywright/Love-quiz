@@ -5,8 +5,8 @@ between two versions:
 
 - **Grown-ups:** 40 statements, rated from "Not at all" to "Very true", then a
   read on how you give and receive love across eight expressions.
-- **Kids:** 12 simple "would you rather your grown-up..." picks (a hug or a
-  chocolate, a bedtime story or a tidy room), then a friendly bar graph showing
+- **Kids:** 30 simple "would you rather your grown-up..." picks (a hug or a
+  chocolate, a movie together or a tidy room), then a friendly bar graph showing
   what they love best.
 
 The eight expressions: Nurturing Communication, Time Together, Actions, Thoughtful Gifts,
