@@ -7,7 +7,8 @@ between two versions:
   read on how you give and receive love across eight expressions.
 - **Kids:** 30 simple "would you rather your grown-up..." picks (a hug or a
   chocolate, a movie together or a tidy room), then a friendly bar graph showing
-  what they love best.
+  what they love best. The 30 are drawn fresh from a bank of 100 each time, so
+  it rotates and stays fun on replays.
 
 The eight expressions: Nurturing Communication, Time Together, Actions, Thoughtful Gifts,
 Physical Affection, Emotional Connection, Intellectual Stimulation and Growth Support.
