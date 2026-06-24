@@ -26,18 +26,25 @@ stylesheet (`style.css`). All client-side, nothing saved:
   questions (funny, gross, and some thoughtful), held in `wyr-questions.js`.
   Add **up to 10 players**, each typing their name and picking their own colour.
   One player = solo (themed in their colour); two or more = play together, where
-  everyone picks each card with a colour dot and you see who agreed. 12 drawn
-  fresh each round.
+  everyone picks each card with a colour dot and you see who agreed. 20 drawn
+  fresh from the 1000 each round, so it rotates every play.
 - **`kind-vs-nice.html`** - sort behaviours into Kind / Just nice / In between,
   with a gentle "why" after each. Teaches that kind = nice plus noticing a need.
+  60-strong bank, 20 fresh each round.
 - **`emotion-detective.html`** - read a face, guess the feeling, see the clues.
-  Runs on emoji now; to use your own pictures, drop files in an `images/`
-  folder and add `src: "images/happy.png"` to the matching emotion in the
-  `EMOTIONS` array at the top of the script.
+  30 emotions, 20 fresh each round. Runs on emoji now; to use your own pictures,
+  drop files in an `images/` folder and add `src: "images/happy.png"` to the
+  matching emotion in the `EMOTIONS` array at the top of the script.
 - **`calm-corner.html`** - a feelings thermometer (1-10) that suggests a
   matching action, plus a dragon-breath animation to follow anywhere.
+- **`personality.html`** - "The Five Traits", a personality quiz based on the
+  Big Five (Five-Factor Model). 40 statements (reverse-scored to reduce bias,
+  shuffled each load), then your profile across Openness, Conscientiousness,
+  Extraversion, Agreeableness and Emotional Stability, with a tuned read on
+  where you sit on each. For reflection, not diagnosis.
 
-The love quiz links to the hub, and the hub links back to everything.
+Every game reshuffles its bank on each play, so the questions rotate. The love
+quiz links to the hub, and the hub links back to everything.
 
 ## Running it
 

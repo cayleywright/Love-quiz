@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Five Traits - a personality quiz</title>
+<meta name="description" content="A personality quiz based on the Big Five (Five-Factor Model). 40 statements, then your profile across five traits. Nothing is saved.">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Scale */
+  .scale { display: flex; gap: 8px; }
+  .scale label { flex: 1; cursor: pointer; text-align: center; }
+  .scale input { position: absolute; opacity: 0; pointer-events: none; }
+  .scale .dot {
+    display: flex; align-items: center; justify-content: center; height: 44px;
+    border: 1.5px solid var(--line); border-radius: 12px; font-weight: 700; font-size: 15px;
+    color: var(--muted); background: #fff; transition: all 0.15s ease;
+  }
+  .scale label:hover .dot { border-color: var(--accent); color: var(--accent); }
+  .scale input:checked + .dot { background: var(--accent); border-color: var(--accent); color: #fff; transform: translateY(-1px); }
+  .scale-legend { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 8px; }
+  .q.answered { border-color: var(--accent-soft); }
+  .q .num { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  .q .text { font-size: 17px; font-weight: 600; margin: 6px 0 16px; }
+
+  #results { display: none; }
+  #results.show { display: block; }
+
+  .badge { display: inline-block; background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; font-size: 13px; padding: 4px 12px; border-radius: 99px; margin-bottom: 12px; }
+  .trait-list { list-style: none; margin: 0; padding: 0; }
+  .trait-list li { margin-bottom: 18px; }
+  .row-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .row-head .name { font-weight: 700; font-size: 16px; }
+  .row-head .pct { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .meter { height: 10px; background: var(--accent-soft); border-radius: 99px; overflow: hidden; }
+  .meter span { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.6s ease; }
+  .row-desc { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+
+  details.exp { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; overflow: hidden; background: #fff; }
+  details.exp > summary {
+    cursor: pointer; padding: 14px 16px; font-weight: 700; font-size: 16px; list-style: none;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  details.exp > summary::-webkit-details-marker { display: none; }
+  details.exp > summary .rank { color: var(--accent); font-size: 13px; font-weight: 700; }
+  details.exp > summary::after { content: "+"; color: var(--accent); font-weight: 700; font-size: 20px; line-height: 1; margin-left: auto; }
+  details.exp[open] > summary::after { content: "\2013"; }
+  details.exp .body { padding: 0 16px 16px; }
+  details.exp .body p { margin: 0 0 12px; font-size: 14px; }
+  details.exp .body .lvl { font-weight: 700; color: var(--accent-deep); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar">
+  <div class="progress-inner">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="count" id="count">0 / 40</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="kicker">A personality quiz</p>
+    <h1>The Five Traits</h1>
+    <p class="lede">Forty statements. Rate how much each sounds like you, then see your profile across the five traits psychologists use to describe personality. Nothing is saved - it all stays on this page.</p>
+  </header>
+
+  <main id="quiz"></main>
+
+  <div class="cta-zone">
+    <button class="cta" id="seeResults" disabled>See my profile</button>
+    <p class="helper" id="helper">Answer all 40 to unlock your profile.</p>
+  </div>
+
+  <section id="results">
+    <div class="results-head">
+      <span class="badge" id="leadBadge"></span>
+      <h2>Your personality profile</h2>
+      <p>Each trait is a spectrum - there's no good or bad end, just where you sit.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Your five traits</h3>
+      <p class="sub">How you scored on each, from low to high.</p>
+      <ul class="trait-list" id="traitList"></ul>
+    </div>
+
+    <div class="panel">
+      <h3>What each one means</h3>
+      <p class="sub">A closer read on each trait, tuned to where you landed. Tap to open.</p>
+      <div id="detailList"></div>
+    </div>
+
+    <div class="actions">
+      <button class="ghost" id="retake">Start over</button>
+      <a class="backlink" href="games.html" style="display:block;margin-top:10px;">← All games</a>
+    </div>
+  </section>
+
+  <footer class="note">
+    Based on the Big Five (the Five-Factor Model) - the most research-backed
+    way psychologists describe personality. For reflection, not diagnosis.
+    <br><a class="backlink" href="games.html">← All games</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // The five traits, with research-grounded descriptions for where you land.
+  var TRAITS = {
+    openness: {
+      name: "Openness",
+      desc: "Curiosity, imagination and openness to new experiences.",
+      high: "You're curious and imaginative - drawn to new ideas, art and experiences, and happy to question how things are usually done.",
+      mid: "You balance curiosity with practicality - open to the new, but comfortable with the familiar too.",
+      low: "You're practical and grounded - you value what's tried-and-true, prefer the concrete over the abstract, and like knowing what to expect."
+    },
+    conscientiousness: {
+      name: "Conscientiousness",
+      desc: "Organisation, discipline and follow-through.",
+      high: "You're organised, dependable and self-disciplined - you plan ahead, finish what you start, and people can rely on you.",
+      mid: "You can buckle down when it matters but keep things flexible - organised enough, without being rigid about it.",
+      low: "You're spontaneous and easy-going - you go with the flow, keep things loose, and don't sweat tidy plans or strict routines."
+    },
+    extraversion: {
+      name: "Extraversion",
+      desc: "Sociability, energy and enthusiasm around other people.",
+      high: "You're outgoing and energised by people - you speak up, seek out company, and bring warmth and energy into a room.",
+      mid: "You're an ambivert - happy in company and happy alone, dialling your energy up or down to suit the moment.",
+      low: "You're more reserved and inward - you recharge in calm and quiet, listen more than you broadcast, and prefer depth to buzz."
+    },
+    agreeableness: {
+      name: "Agreeableness",
+      desc: "Warmth, trust and compassion towards others.",
+      high: "You're warm, trusting and cooperative - tuned in to how others feel, and quick to help and keep the peace.",
+      mid: "You're caring but no pushover - kind to people, while still able to hold your ground when you need to.",
+      low: "You're frank and independent - you speak your mind, question motives, and put honesty and fairness above smoothing things over."
+    },
+    stability: {
+      name: "Emotional Stability",
+      desc: "Staying calm, steady and resilient under pressure.",
+      high: "You're calm and resilient - stress tends to roll off you, you bounce back quickly, and worry rarely keeps you up at night.",
+      mid: "You feel things, but mostly keep an even keel - you can wobble under real pressure, then find your feet again.",
+      low: "You feel things deeply - you're sensitive to stress and setbacks, which makes you empathetic and alert, though it can be draining."
+    }
+  };
+
+  // key: 1 = agreeing raises the trait, -1 = agreeing lowers it (reverse-scored).
+  var STATEMENTS = [
+    { t: "I love getting lost in a new idea or a big question.", e: "openness", k: 1 },
+    { t: "Art, music or a good story can really move me.", e: "openness", k: 1 },
+    { t: "I'd rather try something new than stick to what I know works.", e: "openness", k: 1 },
+    { t: "My imagination tends to run away with me.", e: "openness", k: 1 },
+    { t: "I notice small bits of beauty that other people walk straight past.", e: "openness", k: 1 },
+    { t: "I prefer routines and familiar things to surprises.", e: "openness", k: -1 },
+    { t: "Abstract or theoretical ideas don't really interest me.", e: "openness", k: -1 },
+    { t: "I'm not all that into art or poetry.", e: "openness", k: -1 },
+
+    { t: "I like to have a plan and tick things off it.", e: "conscientiousness", k: 1 },
+    { t: "People can count on me to follow through on what I say.", e: "conscientiousness", k: 1 },
+    { t: "I keep my things tidy and in order.", e: "conscientiousness", k: 1 },
+    { t: "I push through boring tasks until they're properly done.", e: "conscientiousness", k: 1 },
+    { t: "I think things through before I act.", e: "conscientiousness", k: 1 },
+    { t: "I often leave things until the last minute.", e: "conscientiousness", k: -1 },
+    { t: "I can be a bit careless with details.", e: "conscientiousness", k: -1 },
+    { t: "My space tends to be messy and disorganised.", e: "conscientiousness", k: -1 },
+
+    { t: "Being around people gives me energy.", e: "extraversion", k: 1 },
+    { t: "I'm happy to be the one who starts a conversation.", e: "extraversion", k: 1 },
+    { t: "I like being where the buzz and the noise is.", e: "extraversion", k: 1 },
+    { t: "I tend to feel upbeat and full of energy.", e: "extraversion", k: 1 },
+    { t: "I don't mind being the centre of attention.", e: "extraversion", k: 1 },
+    { t: "Too much socialising drains me and I need to retreat.", e: "extraversion", k: -1 },
+    { t: "I'd usually rather stay in than go out.", e: "extraversion", k: -1 },
+    { t: "I tend to stay quiet in groups.", e: "extraversion", k: -1 },
+
+    { t: "I feel other people's emotions almost as if they were my own.", e: "agreeableness", k: 1 },
+    { t: "I go out of my way to make people feel at ease.", e: "agreeableness", k: 1 },
+    { t: "I assume the best about people until they show me otherwise.", e: "agreeableness", k: 1 },
+    { t: "I'd rather cooperate than compete.", e: "agreeableness", k: 1 },
+    { t: "It really bothers me to see someone treated unfairly.", e: "agreeableness", k: 1 },
+    { t: "I can be blunt, even if it stings a little.", e: "agreeableness", k: -1 },
+    { t: "I'm a bit sceptical of people's motives.", e: "agreeableness", k: -1 },
+    { t: "I put my own needs first more often than not.", e: "agreeableness", k: -1 },
+
+    { t: "I stay calm and steady when things get stressful.", e: "stability", k: 1 },
+    { t: "I bounce back quickly after a setback.", e: "stability", k: 1 },
+    { t: "It takes a lot to rattle me.", e: "stability", k: 1 },
+    { t: "I rarely lie awake worrying.", e: "stability", k: 1 },
+    { t: "My mood can swing quite easily.", e: "stability", k: -1 },
+    { t: "I worry about things more than most people do.", e: "stability", k: -1 },
+    { t: "Small frustrations can really get under my skin.", e: "stability", k: -1 },
+    { t: "I often feel tense or on edge.", e: "stability", k: -1 }
+  ];
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  var ITEMS = shuffle(STATEMENTS.slice());
+  var TOTAL = ITEMS.length;
+  var answers = {};
+
+  var quizEl = document.getElementById("quiz");
+  var fillEl = document.getElementById("fill");
+  var countEl = document.getElementById("count");
+  var btn = document.getElementById("seeResults");
+  var helper = document.getElementById("helper");
+  var resultsEl = document.getElementById("results");
+  var LEGEND = ["Not me", "Very me"];
+
+  ITEMS.forEach(function (s, i) {
+    var card = document.createElement("div");
+    card.className = "card q";
+    card.id = "q" + i;
+    var scale = "";
+    for (var v = 1; v <= 5; v++) {
+      scale += '<label><input type="radio" name="q' + i + '" value="' + v + '"><span class="dot">' + v + '</span></label>';
+    }
+    card.innerHTML =
+      '<div class="num">' + (i + 1) + ' / ' + TOTAL + '</div>' +
+      '<div class="text">' + s.t + '</div>' +
+      '<div class="scale">' + scale + '</div>' +
+      '<div class="scale-legend"><span>' + LEGEND[0] + '</span><span>' + LEGEND[1] + '</span></div>';
+    quizEl.appendChild(card);
+    card.querySelectorAll('input[type=radio]').forEach(function (input) {
+      input.addEventListener("change", function () {
+        answers[i] = parseInt(this.value, 10);
+        card.classList.add("answered");
+        updateProgress();
+      });
+    });
+  });
+
+  function updateProgress() {
+    var done = Object.keys(answers).length;
+    fillEl.style.width = Math.round((done / TOTAL) * 100) + "%";
+    countEl.textContent = done + " / " + TOTAL;
+    if (done === TOTAL) {
+      btn.disabled = false;
+      helper.textContent = "All done. See your profile whenever you're ready.";
+    } else {
+      btn.disabled = true;
+      helper.textContent = "Answer all 40 to unlock your profile. (" + (TOTAL - done) + " to go)";
+    }
+  }
+
+  function score() {
+    var sums = {}, counts = {};
+    Object.keys(TRAITS).forEach(function (k) { sums[k] = 0; counts[k] = 0; });
+    ITEMS.forEach(function (s, i) {
+      var r = answers[i];
+      var val = s.k === 1 ? r : (6 - r); // reverse-score
+      sums[s.e] += val; counts[s.e] += 1;
+    });
+    return Object.keys(TRAITS).map(function (k) {
+      var avg = counts[k] ? sums[k] / counts[k] : 0;
+      return { key: k, pct: Math.round((avg / 5) * 100) };
+    });
+  }
+
+  function band(pct) { return pct >= 60 ? "high" : (pct <= 40 ? "low" : "mid"); }
+  function bandWord(b) { return b === "high" ? "Higher" : (b === "low" ? "Lower" : "Balanced"); }
+
+  function renderTraits(scored) {
+    var listEl = document.getElementById("traitList");
+    listEl.innerHTML = "";
+    // show in canonical order
+    Object.keys(TRAITS).forEach(function (k) {
+      var r = scored.find(function (x) { return x.key === k; });
+      var t = TRAITS[k];
+      var li = document.createElement("li");
+      li.innerHTML =
+        '<div class="row-head"><span class="name">' + t.name + '</span><span class="pct">' + r.pct + '%</span></div>' +
+        '<div class="meter"><span style="width:' + r.pct + '%"></span></div>' +
+        '<p class="row-desc">' + t[band(r.pct)] + '</p>';
+      listEl.appendChild(li);
+    });
+  }
+
+  function renderDetails(scored) {
+    var listEl = document.getElementById("detailList");
+    listEl.innerHTML = "";
+    // most defining first = furthest from the middle (50)
+    var ordered = scored.slice().sort(function (a, b) { return Math.abs(b.pct - 50) - Math.abs(a.pct - 50); });
+    ordered.forEach(function (r, idx) {
+      var t = TRAITS[r.key];
+      var b = band(r.pct);
+      var det = document.createElement("details");
+      det.className = "exp";
+      if (idx === 0) det.open = true;
+      det.innerHTML =
+        '<summary><span class="name">' + t.name + '</span><span class="rank">' + bandWord(b) + ' · ' + r.pct + '%</span></summary>' +
+        '<div class="body">' +
+        '<p style="color:var(--muted)">' + t.desc + '</p>' +
+        '<p><span class="lvl">Where you sit:</span> ' + t[b] + '</p>' +
+        '</div>';
+      listEl.appendChild(det);
+    });
+  }
+
+  btn.addEventListener("click", function () {
+    if (Object.keys(answers).length !== TOTAL) return;
+    var scored = score();
+    var standout = scored.slice().sort(function (a, b) { return Math.abs(b.pct - 50) - Math.abs(a.pct - 50); })[0];
+    var b = band(standout.pct);
+    var lead = b === "mid"
+      ? "Your most balanced trait: " + TRAITS[standout.key].name
+      : "Most defining: " + bandWord(b).toLowerCase() + " " + TRAITS[standout.key].name;
+    document.getElementById("leadBadge").textContent = lead;
+    renderTraits(scored);
+    renderDetails(scored);
+    resultsEl.classList.add("show");
+    resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("retake").addEventListener("click", function () {
+    answers = {};
+    resultsEl.classList.remove("show");
+    document.querySelectorAll('input[type=radio]').forEach(function (i) { i.checked = false; });
+    document.querySelectorAll('.q').forEach(function (c) { c.classList.remove("answered"); });
+    updateProgress();
+    document.querySelector("header.hero").scrollIntoView({ behavior: "smooth" });
+  });
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>
