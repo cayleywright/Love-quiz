@@ -25,8 +25,8 @@
   .breath-stage { height: 280px; display: flex; align-items: center; justify-content: center; position: relative; }
   .breath-circle {
     width: 120px; height: 120px; border-radius: 50%;
-    background: radial-gradient(circle at 50% 40%, #f6d8a8, #e88f5a 70%, #d05a5a);
-    box-shadow: 0 0 50px rgba(232, 143, 90, 0.5); transform: scale(0.5);
+    background: radial-gradient(circle at 50% 38%, #eceefc, #c1c6fc 62%, #8e93e0);
+    box-shadow: 0 0 50px rgba(193, 198, 252, 0.6); transform: scale(0.5);
     transition: transform 4s ease-in-out; display: flex; align-items: center; justify-content: center; font-size: 46px;
   }
   .breath-text { font-size: 22px; font-weight: 800; min-height: 30px; margin-top: 6px; }
@@ -106,7 +106,7 @@
 
   // Colour gradient green -> yellow -> red across 1..10
   function levelColour(n) {
-    var stops = [[90, 168, 111], [224, 167, 58], [208, 90, 90]]; // green, yellow, red
+    var stops = [[122, 176, 140], [224, 172, 86], [205, 112, 122]]; // soft green, amber, rose
     var t = (n - 1) / 9;
     var a, b, f;
     if (t < 0.5) { a = stops[0]; b = stops[1]; f = t / 0.5; }

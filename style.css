@@ -121,6 +121,19 @@ button.ghost:hover { border-color: var(--brand); color: var(--accent); }
 .choose-card .c-label { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
 .choose-card .c-desc { font-size: 14px; color: var(--muted); }
 
+/* Lucide-style line-icon chips (matched to pocket-money's icon language) */
+.c-icon {
+  width: 60px; height: 60px; border-radius: 18px;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;
+}
+.c-icon svg { width: 28px; height: 28px; }
+.c-icon.peri  { background: #edeefc; color: #4347a0; }
+.c-icon.rose  { background: #fbe9ec; color: #b15968; }
+.c-icon.blue  { background: #e7f1f9; color: #3a7aa8; }
+.c-icon.sage  { background: #e9f3ec; color: #4d8a61; }
+.c-icon.amber { background: #fbf0dd; color: #b07d2e; }
+.c-icon.plum  { background: #f4e7f3; color: #8e3279; }
+
 /* Results */
 .results-head { text-align: center; margin: 8px 0 24px; }
 .results-head h2 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
