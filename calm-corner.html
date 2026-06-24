@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calm Corner</title>
+<meta name="description" content="A feelings check-in and dragon breathing you can do anywhere. Nothing is saved.">
+<link rel="stylesheet" href="style.css">
+<style>
+  section { display: none; }
+  section.show { display: block; }
+  .thermo { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin: 8px 0 6px; }
+  .thermo button {
+    aspect-ratio: 1 / 1; border-radius: 12px; border: 1.5px solid var(--line); cursor: pointer;
+    font-weight: 800; font-size: 16px; color: #fff; font-family: inherit; transition: transform 0.12s ease;
+  }
+  .thermo button:hover { transform: translateY(-2px) scale(1.05); }
+  .thermo-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .band-emoji { font-size: 52px; display: block; margin-bottom: 6px; }
+  .suggestions { list-style: none; padding: 0; margin: 8px 0 0; }
+  .suggestions li { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; font-weight: 600; font-size: 15px; }
+
+  /* Dragon breathing */
+  .breath-wrap { text-align: center; padding: 10px 0 20px; }
+  .breath-stage { height: 280px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .breath-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, #f6d8a8, #e88f5a 70%, #d05a5a);
+    box-shadow: 0 0 50px rgba(232, 143, 90, 0.5); transform: scale(0.5);
+    transition: transform 4s ease-in-out; display: flex; align-items: center; justify-content: center; font-size: 46px;
+  }
+  .breath-text { font-size: 22px; font-weight: 800; min-height: 30px; margin-top: 6px; }
+  .breath-sub { color: var(--muted); font-size: 14px; min-height: 20px; }
+  .breath-round { color: var(--accent); font-weight: 700; font-size: 13px; margin-top: 8px; min-height: 18px; }
+</style>
+</head>
+<body>
+
+<section id="intro" class="show">
+  <div class="wrap">
+    <header class="hero">
+      <p class="kicker">Your calm corner</p>
+      <h1>How big is the feeling? 🌈</h1>
+      <p class="lede">No feeling is wrong - they just get big sometimes. Tap the number that matches how you feel right now.</p>
+    </header>
+    <div class="card">
+      <div class="thermo-labels"><span>1 · Calm</span><span>Huge · 10</span></div>
+      <div class="thermo" id="thermo"></div>
+    </div>
+    <div class="actions">
+      <button class="ghost" id="justBreathe">Just take me to breathing 🐉</button>
+      <a class="backlink" href="games.html" style="display:block;margin-top:10px;">← All games</a>
+    </div>
+  </div>
+</section>
+
+<section id="plan">
+  <div class="wrap">
+    <header class="hero" style="padding-bottom:8px;"><h1 id="bandTitle" style="font-size:clamp(24px,5vw,34px);"></h1></header>
+    <div class="panel" style="text-align:center;">
+      <span class="band-emoji" id="bandEmoji"></span>
+      <p class="sub" id="bandMsg" style="font-size:16px;color:var(--ink);"></p>
+    </div>
+    <div class="panel">
+      <h3>Things that might help</h3>
+      <ul class="suggestions" id="suggestions"></ul>
+    </div>
+    <div class="cta-zone">
+      <button class="cta" id="breatheBtn">Breathe with the dragon 🐉</button>
+    </div>
+    <div class="actions">
+      <button class="ghost" id="planBack">Check in again</button>
+      <a class="backlink" href="games.html" style="display:block;margin-top:10px;">← All games</a>
+    </div>
+  </div>
+</section>
+
+<section id="breath">
+  <div class="wrap">
+    <div class="breath-wrap">
+      <header class="hero" style="padding:30px 20px 10px;"><h1 style="font-size:clamp(22px,5vw,30px);">Dragon Breaths 🐉</h1></header>
+      <div class="breath-stage"><div class="breath-circle" id="circle">🐉</div></div>
+      <p class="breath-text" id="breathText">Ready?</p>
+      <p class="breath-sub" id="breathSub">Follow the dragon. Breathe in as it grows, breathe out as it shrinks.</p>
+      <p class="breath-round" id="breathRound"></p>
+      <div class="cta-zone">
+        <button class="cta" id="startBreath">Start breathing</button>
+      </div>
+      <div class="actions">
+        <button class="ghost" id="breathBack">I feel better</button>
+        <a class="backlink" href="games.html" style="display:block;margin-top:10px;">← All games</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  var sections = { intro: document.getElementById("intro"), plan: document.getElementById("plan"), breath: document.getElementById("breath") };
+  function show(name) {
+    Object.keys(sections).forEach(function (k) { sections[k].classList.toggle("show", k === name); });
+    window.scrollTo(0, 0);
+  }
+
+  // Colour gradient green -> yellow -> red across 1..10
+  function levelColour(n) {
+    var stops = [[90, 168, 111], [224, 167, 58], [208, 90, 90]]; // green, yellow, red
+    var t = (n - 1) / 9;
+    var a, b, f;
+    if (t < 0.5) { a = stops[0]; b = stops[1]; f = t / 0.5; }
+    else { a = stops[1]; b = stops[2]; f = (t - 0.5) / 0.5; }
+    var c = a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); });
+    return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
+  }
+
+  var thermo = document.getElementById("thermo");
+  for (var n = 1; n <= 10; n++) {
+    (function (num) {
+      var btn = document.createElement("button");
+      btn.textContent = num;
+      btn.style.background = levelColour(num);
+      btn.addEventListener("click", function () { showPlan(num); });
+      thermo.appendChild(btn);
+    })(n);
+  }
+
+  var BANDS = {
+    green: {
+      emoji: "🟢", title: "Nice and calm",
+      msg: "You're feeling pretty steady right now. That's a lovely place to be.",
+      sug: ["Notice 3 things you can see around you.", "Take one slow breath, just because.", "Maybe do something you enjoy."]
+    },
+    yellow: {
+      emoji: "🟡", title: "It's building up",
+      msg: "Something's starting to bubble. Good that you noticed early - that's when it's easiest to settle.",
+      sug: ["Say the feeling out loud: 'I feel ___.'", "Squeeze your fists tight, then let them go.", "Have a sip of cold water.", "Try a few dragon breaths."]
+    },
+    red: {
+      emoji: "🔴", title: "That's a big feeling",
+      msg: "This one's strong. You're not in trouble - big feelings just need slowing right down. Let's do it together.",
+      sug: ["Find a quiet spot if you can.", "Stamp it out, or ask for a hug.", "Then breathe with the dragon, nice and slow."]
+    }
+  };
+
+  function bandFor(n) { return n <= 3 ? "green" : (n <= 7 ? "yellow" : "red"); }
+
+  function showPlan(n) {
+    var b = BANDS[bandFor(n)];
+    document.getElementById("bandTitle").textContent = b.title;
+    document.getElementById("bandEmoji").textContent = b.emoji;
+    document.getElementById("bandMsg").textContent = b.msg;
+    var ul = document.getElementById("suggestions");
+    ul.innerHTML = b.sug.map(function (s) { return "<li>" + s + "</li>"; }).join("");
+    show("plan");
+  }
+
+  // ---- Dragon breathing ----
+  var circle = document.getElementById("circle");
+  var bText = document.getElementById("breathText");
+  var bSub = document.getElementById("breathSub");
+  var bRound = document.getElementById("breathRound");
+  var startBtn = document.getElementById("startBreath");
+  var ROUNDS = 4;
+  var timers = [];
+  var running = false;
+
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function later(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); }
+
+  function setCircle(scale, durMs) {
+    circle.style.transitionDuration = (durMs / 1000) + "s";
+    circle.style.transform = "scale(" + scale + ")";
+  }
+
+  function resetBreath() {
+    clearTimers(); running = false;
+    setCircle(0.5, 300);
+    bText.textContent = "Ready?";
+    bSub.textContent = "Follow the dragon. Breathe in as it grows, breathe out as it shrinks.";
+    bRound.textContent = "";
+    startBtn.textContent = "Start breathing";
+    startBtn.disabled = false;
+  }
+
+  function runRound(i) {
+    if (i > ROUNDS) {
+      bText.textContent = "Well done 💛";
+      bSub.textContent = "Notice how your body feels now. You can do this any time.";
+      bRound.textContent = "";
+      setCircle(0.6, 1500);
+      running = false;
+      startBtn.textContent = "Go again";
+      startBtn.disabled = false;
+      return;
+    }
+    bRound.textContent = "Breath " + i + " of " + ROUNDS;
+    // Breathe in (4s)
+    bText.textContent = "Breathe in...";
+    bSub.textContent = "Smell the flower 🌸";
+    setCircle(1, 4000);
+    later(function () {
+      // Hold (2s)
+      bText.textContent = "Hold...";
+      bSub.textContent = "";
+      later(function () {
+        // Breathe out (6s)
+        bText.textContent = "Breathe out...";
+        bSub.textContent = "Slow dragon fire 🔥";
+        setCircle(0.5, 6000);
+        later(function () { runRound(i + 1); }, 6000);
+      }, 2000);
+    }, 4000);
+  }
+
+  function startBreathing() {
+    if (running) return;
+    running = true;
+    startBtn.disabled = true;
+    startBtn.textContent = "Breathing...";
+    runRound(1);
+  }
+
+  startBtn.addEventListener("click", startBreathing);
+  document.getElementById("breatheBtn").addEventListener("click", function () { resetBreath(); show("breath"); });
+  document.getElementById("justBreathe").addEventListener("click", function () { resetBreath(); show("breath"); });
+  document.getElementById("planBack").addEventListener("click", function () { show("intro"); });
+  document.getElementById("breathBack").addEventListener("click", function () { clearTimers(); running = false; show("intro"); });
+})();
+</script>
+</body>
+</html>

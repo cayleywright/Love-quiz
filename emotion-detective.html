@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emotion Detective</title>
+<meta name="description" content="Read the clues and work out how someone is feeling. Nothing is saved.">
+<link rel="stylesheet" href="style.css">
+<style>
+  #game, #results { display: none; }
+  #game.show, #results.show { display: block; }
+  .face-box {
+    width: 100%; max-width: 320px; margin: 4px auto 18px; aspect-ratio: 1 / 1;
+    border-radius: 20px; border: 1.5px solid var(--line); background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .face-box .face-emoji { font-size: 140px; line-height: 1; }
+  .face-box img { width: 100%; height: 100%; object-fit: cover; }
+  .ans-opts { display: flex; gap: 10px; flex-wrap: wrap; }
+  .ans-btn {
+    flex: 1 1 130px; border: 1.5px solid var(--line); background: #fff; border-radius: 14px;
+    padding: 16px 10px; cursor: pointer; font-family: inherit; text-align: center; font-weight: 700;
+    font-size: 15px; transition: all 0.15s ease;
+  }
+  .ans-btn:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-2px); }
+  .ans-btn:disabled { cursor: default; }
+  .ans-btn.right { background: #e9f5ec; border-color: var(--calm-green); }
+  .ans-btn.wrong { background: #fbeaea; border-color: var(--calm-red); }
+  .clue { margin: 16px 0 4px; font-size: 15px; background: var(--accent-soft); border-radius: 12px; padding: 14px 16px; display: none; }
+  .clue.show { display: block; }
+  .clue .tag { font-weight: 800; }
+  .next-zone { text-align: center; margin-top: 14px; }
+</style>
+</head>
+<body>
+
+<section id="picker" class="wrap">
+  <header class="hero">
+    <p class="kicker">A detective game</p>
+    <h1>Emotion Detective 🕵️</h1>
+    <p class="lede">Look at the face and work out how they're feeling. Then see the clues a real detective would spot - in the eyes, the mouth, the body.</p>
+  </header>
+  <div class="cta-zone">
+    <button class="cta" id="startBtn">Start detecting</button>
+  </div>
+  <div class="actions"><a class="backlink" href="games.html">← All games</a></div>
+</section>
+
+<section id="game">
+  <div class="progress-bar">
+    <div class="progress-inner">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="count" id="count">1 / 10</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <header class="hero" style="padding-bottom:6px;"><h1 style="font-size:clamp(22px,5vw,30px);">How are they feeling?</h1></header>
+    <div id="stage"></div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <div id="resultBody"></div>
+    <div class="actions">
+      <button class="ghost" id="again">Play again</button>
+      <a class="backlink" href="games.html" style="display:block;margin-top:10px;">← All games</a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  /*
+   * TO ADD YOUR OWN FACE PICTURES (e.g. from Higgsfield):
+   *   1. Drop the image files into an "images/" folder next to this page.
+   *   2. Add  src: "images/happy.png"  to the matching emotion below.
+   * If an emotion has no "src", the game just shows its emoji instead, so it
+   * works right now and upgrades to your pictures as you add them.
+   */
+  var EMOTIONS = [
+    { label: "Happy",      emoji: "😀", clue: "Big smile, bright eyes, relaxed shoulders." },
+    { label: "Sad",        emoji: "😢", clue: "Mouth turned down, looking down, maybe a little teary." },
+    { label: "Angry",      emoji: "😠", clue: "Tight jaw, frowning eyebrows, maybe crossed arms." },
+    { label: "Scared",     emoji: "😨", clue: "Wide eyes, raised eyebrows, body very still." },
+    { label: "Surprised",  emoji: "😲", clue: "Open mouth, eyebrows way up, a quick gasp." },
+    { label: "Excited",    emoji: "🤩", clue: "Huge grin, bouncy, can't keep still." },
+    { label: "Shy",        emoji: "😳", clue: "Looking away, small smile, turned in a little." },
+    { label: "Worried",    emoji: "😟", clue: "Wrinkled brow, biting a lip, fidgeting hands." },
+    { label: "Proud",      emoji: "😌", clue: "Chin up, calm little smile, standing tall." },
+    { label: "Bored",      emoji: "😑", clue: "Flat face, slumped over, staring into space." },
+    { label: "Confused",   emoji: "😕", clue: "Head tilted, one eyebrow up, a squinty look." },
+    { label: "Tired",      emoji: "😴", clue: "Droopy eyes, yawning, moving slowly." },
+    { label: "Nervous",    emoji: "😬", clue: "Fiddling hands, quick breaths, eyes darting around." },
+    { label: "Embarrassed",emoji: "😅", clue: "Red cheeks, hiding the face a bit, an awkward smile." },
+    { label: "Frustrated", emoji: "😤", clue: "Clenched fists, huffing out air, scrunched-up face." },
+    { label: "Grateful",   emoji: "🥰", clue: "Warm smile, soft eyes, maybe a hand on the heart." }
+  ];
+
+  var SET_SIZE = 10;
+
+  var pickerEl = document.getElementById("picker");
+  var gameEl = document.getElementById("game");
+  var resultsEl = document.getElementById("results");
+  var stage = document.getElementById("stage");
+  var fillEl = document.getElementById("fill");
+  var countEl = document.getElementById("count");
+
+  var SET = [], idx = 0, score = 0;
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function start() {
+    SET = shuffle(EMOTIONS.slice()).slice(0, Math.min(SET_SIZE, EMOTIONS.length)).map(function (e) {
+      // build 4 options: the answer + 3 random others
+      var others = shuffle(EMOTIONS.filter(function (x) { return x.label !== e.label; })).slice(0, 3);
+      var options = shuffle(others.concat([e]).map(function (x) { return x.label; }));
+      return { e: e, options: options };
+    });
+    idx = 0; score = 0;
+    pickerEl.style.display = "none";
+    resultsEl.classList.remove("show");
+    gameEl.classList.add("show");
+    renderCard();
+    window.scrollTo(0, 0);
+  }
+
+  function updateProgress() {
+    fillEl.style.width = Math.round((idx / SET.length) * 100) + "%";
+    countEl.textContent = (idx + 1) + " / " + SET.length;
+  }
+
+  function faceHTML(e) {
+    if (e.src) return '<img src="' + e.src + '" alt="a face">';
+    return '<span class="face-emoji">' + e.emoji + '</span>';
+  }
+
+  function renderCard() {
+    updateProgress();
+    var q = SET[idx];
+    var btns = q.options.map(function (label) {
+      return '<button class="ans-btn" data-label="' + label + '">' + label + '</button>';
+    }).join("");
+    stage.innerHTML =
+      '<div class="card rise">' +
+      '<div class="face-box">' + faceHTML(q.e) + '</div>' +
+      '<div class="ans-opts">' + btns + '</div>' +
+      '<div class="clue" id="clue"></div>' +
+      '<div class="next-zone" id="nextZone"></div>' +
+      '</div>';
+    stage.querySelectorAll(".ans-btn").forEach(function (b) {
+      b.addEventListener("click", function () { onPick(this.getAttribute("data-label")); });
+    });
+  }
+
+  function onPick(label) {
+    var q = SET[idx];
+    var correct = q.e.label;
+    if (label === correct) score++;
+    stage.querySelectorAll(".ans-btn").forEach(function (b) {
+      b.disabled = true;
+      var l = b.getAttribute("data-label");
+      if (l === correct) b.classList.add("right");
+      if (l === label && label !== correct) b.classList.add("wrong");
+    });
+    var clue = document.getElementById("clue");
+    clue.innerHTML = '<span class="tag">' + correct + '.</span> ' + q.e.clue;
+    clue.classList.add("show");
+
+    var nz = document.getElementById("nextZone");
+    var nb = document.createElement("button");
+    nb.className = "cta"; nb.style.fontSize = "16px"; nb.style.padding = "12px 30px";
+    nb.textContent = (idx === SET.length - 1) ? "See how you did" : "Next clue";
+    nb.addEventListener("click", advance);
+    nz.appendChild(nb);
+  }
+
+  function advance() {
+    idx++;
+    if (idx >= SET.length) { finish(); return; }
+    renderCard();
+  }
+
+  function finish() {
+    gameEl.classList.remove("show");
+    var total = SET.length;
+    var line;
+    if (score >= total - 1) line = "Top detective! You read faces brilliantly. 🕵️";
+    else if (score >= total / 2) line = "Good detecting - you're spotting the clues.";
+    else line = "Faces are tricky. The more you watch eyes, mouths and bodies, the easier it gets.";
+    document.getElementById("resultBody").innerHTML =
+      '<div class="results-head rise"><h2>You solved ' + score + ' of ' + total + '</h2><p>' + line + '</p></div>' +
+      '<div class="panel" style="text-align:center"><p class="big"><span class="big-emoji">🔎</span>Clue spotting</p>' +
+      '<p class="sub" style="text-align:center">Feelings show up in three places: the eyes, the mouth, and the body. Check all three.</p></div>';
+    resultsEl.classList.add("show");
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById("startBtn").addEventListener("click", start);
+  document.getElementById("again").addEventListener("click", start);
+})();
+</script>
+</body>
+</html>

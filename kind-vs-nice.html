@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kind or Just Nice?</title>
+<meta name="description" content="Sort behaviours into kind, just nice, or in between - and learn the difference. Nothing is saved.">
+<link rel="stylesheet" href="style.css">
+<style>
+  #game, #results { display: none; }
+  #game.show, #results.show { display: block; }
+  .sort-opts { display: flex; gap: 10px; flex-wrap: wrap; }
+  .sort-btn {
+    flex: 1 1 100px; border: 1.5px solid var(--line); background: #fff; border-radius: 14px;
+    padding: 16px 10px; cursor: pointer; font-family: inherit; text-align: center; transition: all 0.15s ease;
+  }
+  .sort-btn:hover:not(:disabled) { transform: translateY(-2px); }
+  .sort-btn .s-emoji { font-size: 28px; display: block; margin-bottom: 6px; }
+  .sort-btn .s-label { font-size: 14px; font-weight: 700; }
+  .sort-btn.kind:hover:not(:disabled) { border-color: var(--accent); }
+  .sort-btn[data-correct].right { background: #e9f5ec; border-color: var(--calm-green); }
+  .sort-btn[data-correct].wrong { background: #fbeaea; border-color: var(--calm-red); }
+  .sort-btn:disabled { cursor: default; opacity: 0.85; }
+  .why { margin: 16px 0 4px; font-size: 15px; color: var(--ink); background: var(--accent-soft); border-radius: 12px; padding: 14px 16px; display: none; }
+  .why.show { display: block; }
+  .why .tag { font-weight: 800; }
+  .next-zone { text-align: center; margin-top: 14px; }
+</style>
+</head>
+<body>
+
+<section id="picker" class="wrap">
+  <header class="hero">
+    <p class="kicker">A thinking game</p>
+    <h1>Kind or Just Nice?</h1>
+    <p class="lede">Some things are <strong>nice</strong> - polite and pleasant and easy. Some things are <strong>kind</strong> - they help someone who needs it, even when it's a bit hard. And some sit right in between. Have a go at sorting them.</p>
+  </header>
+  <div class="cta-zone">
+    <button class="cta" id="startBtn">Start sorting</button>
+  </div>
+  <div class="actions"><a class="backlink" href="games.html">← All games</a></div>
+</section>
+
+<section id="game">
+  <div class="progress-bar">
+    <div class="progress-inner">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="count" id="count">1 / 12</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <header class="hero" style="padding-bottom:6px;"><h1 style="font-size:clamp(22px,5vw,30px);">Is this kind, or just nice?</h1></header>
+    <div id="stage"></div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <div id="resultBody"></div>
+    <div class="actions">
+      <button class="ghost" id="again">Play again</button>
+      <a class="backlink" href="games.html" style="display:block;margin-top:10px;">← All games</a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  // answer: "kind" | "nice" | "middle"
+  var BANK = [
+    { t: "Sharing your snack with someone who forgot theirs", answer: "kind", why: "You noticed they had nothing and gave up some of yours. That's kindness." },
+    { t: "Saying 'good morning' with a smile", answer: "nice", why: "Lovely manners - pleasant and warm, but easy to do." },
+    { t: "Sitting next to someone who's being left out", answer: "kind", why: "That takes a little courage, and it really helps them feel they belong." },
+    { t: "Saying please and thank you", answer: "nice", why: "Good manners. Polite and pleasant, and simple to do." },
+    { t: "Telling a friend their painting is great when you don't mean it", answer: "middle", why: "It's nice, but it isn't honest. Kind might be a gentle true thing instead." },
+    { t: "Standing up for someone who's being teased", answer: "kind", why: "Brave and caring, even when it feels hard." },
+    { t: "Letting someone go first in line", answer: "middle", why: "Polite for sure. It becomes kind when they really need to hurry." },
+    { t: "Inviting the new kid to play", answer: "kind", why: "You included someone who felt alone. That's a big kindness." },
+    { t: "Complimenting someone's shoes", answer: "nice", why: "A friendly thing to say - pleasant and easy." },
+    { t: "Telling a grown-up when someone is hurt", answer: "kind", why: "You helped someone who needed it, even if it felt awkward." },
+    { t: "Waving hello to a neighbour", answer: "nice", why: "Friendly and warm. Nice and simple." },
+    { t: "Giving up your turn so a sad friend can have a go", answer: "kind", why: "You put their feelings first. That's real kindness." },
+    { t: "Not laughing when someone trips", answer: "kind", why: "You protected their feelings instead of getting a laugh." },
+    { t: "Holding the door open for someone", answer: "nice", why: "Polite and pleasant - a small good manner." },
+    { t: "Helping someone pick up books they dropped", answer: "middle", why: "Helpful and nice. It's extra kind if you stop what you're doing to help." },
+    { t: "Keeping it secret that someone is being bullied", answer: "middle", why: "It feels loyal, but the kind thing is telling someone who can help." },
+    { t: "Staying with a friend who's crying", answer: "kind", why: "You noticed their feelings and didn't leave them alone." },
+    { t: "Saying 'nice job' to a teammate", answer: "nice", why: "Encouraging and pleasant - easy and lovely." },
+    { t: "Sharing the last lolly with your sister", answer: "kind", why: "You gave up something you wanted. That's kindness." },
+    { t: "Smiling at someone new", answer: "nice", why: "Warm and welcoming - a small, easy good thing." },
+    { t: "Telling the truth gently when it's hard", answer: "kind", why: "Honest and caring at the same time. Tricky, but kind." },
+    { t: "Clapping when someone else wins", answer: "nice", why: "Good sportsmanship. Pleasant and polite." },
+    { t: "Helping a younger kid who's stuck", answer: "kind", why: "You used what you know to help someone who needed it." },
+    { t: "Saying a toy is cool when you don't really care", answer: "nice", why: "Friendly small talk. Pleasant, and it costs nothing." }
+  ];
+
+  var CHOICES = [
+    { key: "kind",   emoji: "💛", label: "Kind" },
+    { key: "nice",   emoji: "🙂", label: "Just nice" },
+    { key: "middle", emoji: "🤔", label: "In between" }
+  ];
+  var LABEL = { kind: "Kind", nice: "Just nice", middle: "In between" };
+  var SET_SIZE = 12;
+
+  var pickerEl = document.getElementById("picker");
+  var gameEl = document.getElementById("game");
+  var resultsEl = document.getElementById("results");
+  var stage = document.getElementById("stage");
+  var fillEl = document.getElementById("fill");
+  var countEl = document.getElementById("count");
+
+  var SET = [], idx = 0, score = 0;
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function start() {
+    SET = shuffle(BANK.slice()).slice(0, SET_SIZE);
+    idx = 0; score = 0;
+    pickerEl.style.display = "none";
+    resultsEl.classList.remove("show");
+    gameEl.classList.add("show");
+    renderCard();
+    window.scrollTo(0, 0);
+  }
+
+  function updateProgress() {
+    fillEl.style.width = Math.round((idx / SET.length) * 100) + "%";
+    countEl.textContent = (idx + 1) + " / " + SET.length;
+  }
+
+  function renderCard() {
+    updateProgress();
+    var q = SET[idx];
+    var btns = CHOICES.map(function (c) {
+      return '<button class="sort-btn kind" data-key="' + c.key + '">' +
+        '<span class="s-emoji">' + c.emoji + '</span><span class="s-label">' + c.label + '</span></button>';
+    }).join("");
+    stage.innerHTML =
+      '<div class="card rise">' +
+      '<div class="stem">' + q.t + '</div>' +
+      '<div class="sort-opts">' + btns + '</div>' +
+      '<div class="why" id="why"></div>' +
+      '<div class="next-zone" id="nextZone"></div>' +
+      '</div>';
+    stage.querySelectorAll(".sort-btn").forEach(function (b) {
+      b.addEventListener("click", function () { onPick(this.getAttribute("data-key")); });
+    });
+  }
+
+  function onPick(key) {
+    var q = SET[idx];
+    var correct = q.answer;
+    if (key === correct) score++;
+    stage.querySelectorAll(".sort-btn").forEach(function (b) {
+      b.disabled = true;
+      var k = b.getAttribute("data-key");
+      if (k === correct) { b.setAttribute("data-correct", "1"); b.classList.add("right"); }
+      if (k === key && key !== correct) b.classList.add("wrong");
+    });
+    var why = document.getElementById("why");
+    var lead = (key === correct) ? "Yes - " : "Good think. Most people would say ";
+    why.innerHTML = '<span class="tag">' + LABEL[correct] + '.</span> ' + q.why;
+    why.classList.add("show");
+
+    var nz = document.getElementById("nextZone");
+    var nb = document.createElement("button");
+    nb.className = "cta"; nb.style.fontSize = "16px"; nb.style.padding = "12px 30px";
+    nb.textContent = (idx === SET.length - 1) ? "See how you did" : "Next";
+    nb.addEventListener("click", advance);
+    nz.appendChild(nb);
+  }
+
+  function advance() {
+    idx++;
+    if (idx >= SET.length) { finish(); return; }
+    renderCard();
+  }
+
+  function finish() {
+    gameEl.classList.remove("show");
+    var total = SET.length;
+    var line;
+    if (score >= total - 2) line = "You really get the difference. 💛";
+    else if (score >= total / 2) line = "You're getting the hang of it - some are genuinely tricky.";
+    else line = "Some of these are hard, and there's no perfect answer. The thinking is what counts.";
+    document.getElementById("resultBody").innerHTML =
+      '<div class="results-head rise"><h2>You saw it the same way on ' + score + ' of ' + total + '</h2><p>' + line + '</p></div>' +
+      '<div class="panel" style="text-align:center"><p class="big"><span class="big-emoji">💛</span>Kind beats nice</p>' +
+      '<p class="sub" style="text-align:center">Nice is lovely. Kind is nice <em>plus</em> noticing what someone needs - even when it costs you a little.</p></div>';
+    resultsEl.classList.add("show");
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById("startBtn").addEventListener("click", start);
+  document.getElementById("again").addEventListener("click", start);
+})();
+</script>
+</body>
+</html>

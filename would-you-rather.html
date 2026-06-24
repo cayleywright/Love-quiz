@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Would You Rather</title>
+<meta name="description" content="Silly rapid-fire would-you-rather. Play solo or together to see where you match. Nothing is saved.">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Player picker */
+  .player-grid { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .player-card {
+    flex: 1 1 200px; border-radius: 20px; padding: 28px 20px; cursor: pointer;
+    border: 2px solid var(--line); background: #fff; box-shadow: var(--shadow);
+    font-family: inherit; text-align: center; transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .player-card:hover { transform: translateY(-3px); }
+  .player-card .p-emoji { font-size: 44px; display: block; margin-bottom: 10px; }
+  .player-card .p-name { font-size: 20px; font-weight: 800; }
+  .player-card .p-desc { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .player-card.bp { border-color: var(--bp-soft); } .player-card.bp:hover { border-color: var(--bp); }
+  .player-card.bp .p-name { color: var(--bp-deep); }
+  .player-card.chris { border-color: var(--chris-soft); } .player-card.chris:hover { border-color: var(--chris); }
+  .player-card.chris .p-name { color: var(--chris-deep); }
+  .player-card.both { border-color: var(--accent-soft); } .player-card.both:hover { border-color: var(--accent); }
+  .player-card.both .p-name { color: var(--accent-deep); }
+
+  /* Theme accent per active player */
+  body.mode-bp { --accent: var(--bp); --accent-soft: var(--bp-soft); --accent-deep: var(--bp-deep); }
+  body.mode-chris { --accent: var(--chris); --accent-soft: var(--chris-soft); --accent-deep: var(--chris-deep); }
+
+  #game, #results { display: none; }
+  #game.show, #results.show { display: block; }
+
+  .turn { text-align: center; font-weight: 800; font-size: 16px; margin: 0 0 14px; }
+  .turn.bp { color: var(--bp-deep); } .turn.chris { color: var(--chris-deep); }
+
+  .opt { position: relative; }
+  .opt .picks { position: absolute; top: 8px; right: 10px; font-size: 18px; letter-spacing: 2px; }
+  .opt.picked-bp { border-color: var(--bp); box-shadow: 0 0 0 2px var(--bp-soft) inset; }
+  .opt.picked-chris { border-color: var(--chris); box-shadow: 0 0 0 2px var(--chris-soft) inset; }
+  .opt.picked-bp.picked-chris { border-color: var(--accent); }
+
+  .reveal { text-align: center; margin: 18px 0 4px; font-size: 18px; font-weight: 800; min-height: 26px; }
+  .reveal.match { color: var(--accent-deep); }
+  .reveal.diff { color: var(--muted); }
+  .next-zone { text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<section id="picker" class="wrap">
+  <header class="hero">
+    <p class="kicker">A silly game</p>
+    <h1>Would You Rather?</h1>
+    <p class="lede">Pick the one you'd rather. There are no wrong answers - just funny ones. Who's playing?</p>
+  </header>
+  <div class="player-grid">
+    <button class="player-card bp" data-mode="solo-bp">
+      <span class="p-emoji">💜</span><span class="p-name">Bella-Paige</span>
+      <span class="p-desc">Play on my own</span>
+    </button>
+    <button class="player-card chris" data-mode="solo-chris">
+      <span class="p-emoji">💙</span><span class="p-name">Chris</span>
+      <span class="p-desc">Play on my own</span>
+    </button>
+    <button class="player-card both" data-mode="together">
+      <span class="p-emoji">💜💙</span><span class="p-name">Play Together</span>
+      <span class="p-desc">Both pick, see where you match</span>
+    </button>
+  </div>
+  <div class="actions"><a class="backlink" href="games.html">← All games</a></div>
+</section>
+
+<section id="game">
+  <div class="progress-bar">
+    <div class="progress-inner">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="count" id="count">1 / 12</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <header class="hero" style="padding-bottom:8px;"><h1 id="gameTitle" style="font-size:clamp(24px,5vw,34px);">Would you rather...</h1></header>
+    <div id="stage"></div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <div id="resultBody"></div>
+    <div class="actions">
+      <button class="ghost" id="again">Play again</button>
+      <button class="ghost" id="back">Back to start</button>
+    </div>
+    <div class="actions" style="margin-top:0;"><a class="backlink" href="games.html">← All games</a></div>
+  </div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  var BANK = [
+    { a: { emoji: "🦖", t: "Be a dinosaur" }, b: { emoji: "🐉", t: "Be a dragon" } },
+    { a: { emoji: "🍕", t: "Only eat pizza forever" }, b: { emoji: "🍦", t: "Only eat ice cream forever" } },
+    { a: { emoji: "🦸", t: "Have super strength" }, b: { emoji: "🦅", t: "Be able to fly" } },
+    { a: { emoji: "🏖️", t: "Live at the beach" }, b: { emoji: "🏔️", t: "Live on a snowy mountain" } },
+    { a: { emoji: "🐶", t: "Have a puppy that talks" }, b: { emoji: "🐱", t: "Have a cat that does magic" } },
+    { a: { emoji: "🌧️", t: "Jump in puddles" }, b: { emoji: "☀️", t: "Build sandcastles" } },
+    { a: { emoji: "🍫", t: "A chocolate fountain at home" }, b: { emoji: "🎡", t: "A ferris wheel in the backyard" } },
+    { a: { emoji: "👻", t: "Explore a spooky castle" }, b: { emoji: "🚀", t: "Explore outer space" } },
+    { a: { emoji: "🎨", t: "Be amazing at drawing" }, b: { emoji: "🎵", t: "Be amazing at music" } },
+    { a: { emoji: "🕰️", t: "Travel to the past" }, b: { emoji: "🔮", t: "Travel to the future" } },
+    { a: { emoji: "🐠", t: "Breathe underwater" }, b: { emoji: "🌳", t: "Climb the tallest tree" } },
+    { a: { emoji: "🍳", t: "Breakfast for dinner" }, b: { emoji: "🥞", t: "Dinner for breakfast" } },
+    { a: { emoji: "🎢", t: "Ride roller coasters all day" }, b: { emoji: "🎮", t: "Play games all day" } },
+    { a: { emoji: "🤫", t: "Be invisible for a day" }, b: { emoji: "🦻", t: "Hear what animals say" } },
+    { a: { emoji: "🌈", t: "Slide down a rainbow" }, b: { emoji: "☁️", t: "Bounce on a cloud" } },
+    { a: { emoji: "🐧", t: "Have a pet penguin" }, b: { emoji: "🦒", t: "Have a pet giraffe" } },
+    { a: { emoji: "🎂", t: "Birthday every week" }, b: { emoji: "🎄", t: "Christmas every month" } },
+    { a: { emoji: "🛼", t: "Roller skate everywhere" }, b: { emoji: "🛹", t: "Skateboard everywhere" } },
+    { a: { emoji: "🐭", t: "Be tiny like a mouse" }, b: { emoji: "🐘", t: "Be huge like a giant" } },
+    { a: { emoji: "🐬", t: "Swim with dolphins" }, b: { emoji: "🐎", t: "Ride a horse on the beach" } },
+    { a: { emoji: "🎪", t: "Run away to the circus" }, b: { emoji: "🎬", t: "Star in a movie" } },
+    { a: { emoji: "🧠", t: "Read minds" }, b: { emoji: "🌀", t: "Teleport anywhere" } },
+    { a: { emoji: "🧁", t: "Be a baker" }, b: { emoji: "🚒", t: "Be a firefighter" } },
+    { a: { emoji: "❄️", t: "Make it snow whenever" }, b: { emoji: "🌸", t: "Make flowers grow whenever" } },
+    { a: { emoji: "🦋", t: "Have butterfly wings" }, b: { emoji: "🐙", t: "Have eight arms" } },
+    { a: { emoji: "🏰", t: "Live in a castle" }, b: { emoji: "🌲", t: "Live in a treehouse" } },
+    { a: { emoji: "🎤", t: "Sing in front of everyone" }, b: { emoji: "💃", t: "Dance in front of everyone" } },
+    { a: { emoji: "🍿", t: "Movie night at home" }, b: { emoji: "🏕️", t: "Camping under the stars" } },
+    { a: { emoji: "🐰", t: "Hop like a bunny" }, b: { emoji: "🦘", t: "Bounce like a kangaroo" } },
+    { a: { emoji: "🎁", t: "Give presents" }, b: { emoji: "🎀", t: "Get presents" } },
+    { a: { emoji: "🌊", t: "A day at the water park" }, b: { emoji: "🎠", t: "A day at the fun fair" } },
+    { a: { emoji: "🧩", t: "Always win at games" }, b: { emoji: "🤣", t: "Always tell the best jokes" } },
+    { a: { emoji: "🍜", t: "Slurp noodles" }, b: { emoji: "🍔", t: "Munch burgers" } },
+    { a: { emoji: "🚗", t: "Drive a race car" }, b: { emoji: "✈️", t: "Fly a plane" } },
+    { a: { emoji: "🍉", t: "A watermelon as big as a car" }, b: { emoji: "🍇", t: "Grapes the size of footballs" } },
+    { a: { emoji: "🌙", t: "Stay up all night" }, b: { emoji: "🌅", t: "Wake up for the sunrise" } },
+    { a: { emoji: "🐢", t: "Be slow but never tired" }, b: { emoji: "🐆", t: "Be super fast but need rest" } },
+    { a: { emoji: "🍫", t: "Touch turns things to chocolate" }, b: { emoji: "🪙", t: "Touch turns things to gold" } },
+    { a: { emoji: "🧦", t: "Wear pyjamas all day" }, b: { emoji: "👑", t: "Wear a fancy costume all day" } },
+    { a: { emoji: "🌍", t: "Visit every country" }, b: { emoji: "🌌", t: "Visit every planet" } },
+    { a: { emoji: "🎻", t: "Be in an orchestra" }, b: { emoji: "⚽", t: "Be on a sports team" } },
+    { a: { emoji: "🍪", t: "A cookie that refills itself" }, b: { emoji: "🥤", t: "A drink that's always cold" } },
+    { a: { emoji: "🤖", t: "Have a robot helper" }, b: { emoji: "🧚", t: "Have a fairy helper" } },
+    { a: { emoji: "🌟", t: "Be a little good at everything" }, b: { emoji: "🏆", t: "Be the best at one thing" } },
+    { a: { emoji: "🦉", t: "Be wise like an owl" }, b: { emoji: "🦁", t: "Be brave like a lion" } },
+    { a: { emoji: "🛌", t: "A bed that bounces like a trampoline" }, b: { emoji: "🛝", t: "A slide instead of stairs" } },
+    { a: { emoji: "🐳", t: "Ride on a whale" }, b: { emoji: "🦋", t: "Ride a giant butterfly" } },
+    { a: { emoji: "🍓", t: "Strawberry everything" }, b: { emoji: "🍌", t: "Banana everything" } },
+    { a: { emoji: "🔦", t: "Glow in the dark" }, b: { emoji: "🌈", t: "Change colour with your mood" } },
+    { a: { emoji: "🎈", t: "Float away with balloons" }, b: { emoji: "🪂", t: "Parachute down safely" } }
+  ];
+
+  var SET_SIZE = 12;
+  var PLAYERS = {
+    "solo-bp":   { who: "Bella-Paige", icon: "💜", together: false, bodyClass: "mode-bp" },
+    "solo-chris":{ who: "Chris",       icon: "💙", together: false, bodyClass: "mode-chris" },
+    "together":  { who: null,          icon: "💜💙", together: true, bodyClass: "" }
+  };
+
+  var pickerEl = document.getElementById("picker");
+  var gameEl = document.getElementById("game");
+  var resultsEl = document.getElementById("results");
+  var stage = document.getElementById("stage");
+  var fillEl = document.getElementById("fill");
+  var countEl = document.getElementById("count");
+  var titleEl = document.getElementById("gameTitle");
+
+  var mode = null, SET = [], idx = 0, matches = 0;
+  // together per-card state
+  var phase = "bp", bpPick = null, chrisPick = null;
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function start(m) {
+    mode = m;
+    document.body.className = PLAYERS[m].bodyClass;
+    SET = shuffle(BANK.slice()).slice(0, SET_SIZE).map(function (q) {
+      return Math.random() < 0.5 ? { a: q.b, b: q.a } : { a: q.a, b: q.b };
+    });
+    idx = 0; matches = 0;
+    pickerEl.style.display = "none";
+    resultsEl.classList.remove("show");
+    gameEl.classList.add("show");
+    renderCard();
+    window.scrollTo(0, 0);
+  }
+
+  function updateProgress() {
+    var pct = Math.round((idx / SET.length) * 100);
+    fillEl.style.width = pct + "%";
+    countEl.textContent = (idx + 1) + " / " + SET.length;
+  }
+
+  function optHTML(side, o) {
+    return '<button class="opt" data-side="' + side + '">' +
+      '<span class="picks"></span>' +
+      '<span class="emoji">' + o.emoji + '</span>' +
+      '<span class="label">' + o.t + '</span></button>';
+  }
+
+  function renderCard() {
+    updateProgress();
+    var q = SET[idx];
+    var together = PLAYERS[mode].together;
+    phase = "bp"; bpPick = null; chrisPick = null;
+
+    var turnHTML = together
+      ? '<p class="turn bp" id="turn">Bella-Paige, your turn 💜</p>'
+      : '<p class="turn" id="turn" style="color:var(--accent-deep)">' + PLAYERS[mode].icon + " " + PLAYERS[mode].who + ', your pick</p>';
+
+    stage.innerHTML =
+      '<div class="card rise">' +
+      turnHTML +
+      '<div class="opts">' + optHTML("a", q.a) + optHTML("b", q.b) + '</div>' +
+      '<div class="reveal" id="reveal"></div>' +
+      '<div class="next-zone" id="nextZone"></div>' +
+      '</div>';
+
+    var opts = stage.querySelectorAll(".opt");
+    opts.forEach(function (btn) {
+      btn.addEventListener("click", function () { onPick(this.getAttribute("data-side")); });
+    });
+  }
+
+  function markPick(side, who) {
+    var btn = stage.querySelector('.opt[data-side="' + side + '"]');
+    btn.classList.add(who === "bp" ? "picked-bp" : "picked-chris");
+    var picks = btn.querySelector(".picks");
+    picks.textContent += (who === "bp" ? "💜" : "💙");
+  }
+
+  function onPick(side) {
+    var together = PLAYERS[mode].together;
+    if (!together) {
+      // solo: highlight and move on
+      var btn = stage.querySelector('.opt[data-side="' + side + '"]');
+      btn.classList.add("sel");
+      stage.querySelectorAll(".opt").forEach(function (b) { b.disabled = true; });
+      setTimeout(advance, 320);
+      return;
+    }
+    // together: two phases
+    if (phase === "bp") {
+      bpPick = side;
+      markPick(side, "bp");
+      phase = "chris";
+      document.getElementById("turn").className = "turn chris";
+      document.getElementById("turn").textContent = "Chris, your turn 💙";
+    } else if (phase === "chris") {
+      chrisPick = side;
+      markPick(side, "chris");
+      phase = "done";
+      stage.querySelectorAll(".opt").forEach(function (b) { b.disabled = true; });
+      var reveal = document.getElementById("reveal");
+      if (bpPick === chrisPick) {
+        matches++;
+        reveal.className = "reveal match";
+        reveal.textContent = "You matched! 💖";
+      } else {
+        reveal.className = "reveal diff";
+        reveal.textContent = "Different picks 😄";
+      }
+      var nz = document.getElementById("nextZone");
+      var nb = document.createElement("button");
+      nb.className = "cta";
+      nb.style.fontSize = "16px";
+      nb.style.padding = "12px 30px";
+      nb.textContent = (idx === SET.length - 1) ? "See how you did" : "Next";
+      nb.addEventListener("click", advance);
+      nz.appendChild(nb);
+    }
+  }
+
+  function advance() {
+    idx++;
+    if (idx >= SET.length) { finish(); return; }
+    renderCard();
+  }
+
+  function finish() {
+    gameEl.classList.remove("show");
+    var body = document.getElementById("resultBody");
+    var together = PLAYERS[mode].together;
+    if (together) {
+      var total = SET.length;
+      var pct = Math.round((matches / total) * 100);
+      var line;
+      if (pct >= 75) line = "Wow, you two think so alike! 💞";
+      else if (pct >= 40) line = "A lovely mix of same and different. 😊";
+      else line = "You're wonderfully different - so much to chat about! 🌈";
+      body.innerHTML =
+        '<div class="results-head rise"><h2>You matched on ' + matches + ' out of ' + total + '</h2><p>' + line + '</p></div>' +
+        '<div class="panel" style="text-align:center"><p class="big"><span class="big-emoji">💜💙</span>' + pct + '% the same</p>' +
+        '<p class="sub" style="text-align:center">Talk about the ones where you picked differently - that\'s the fun part.</p></div>';
+    } else {
+      var who = PLAYERS[mode].who, icon = PLAYERS[mode].icon;
+      body.innerHTML =
+        '<div class="results-head rise"><h2>Nice picks, ' + who + '! ' + icon + '</h2>' +
+        '<p>' + SET.length + ' silly choices made. Want some new ones?</p></div>';
+    }
+    resultsEl.classList.add("show");
+    window.scrollTo(0, 0);
+  }
+
+  document.querySelectorAll(".player-card").forEach(function (c) {
+    c.addEventListener("click", function () { start(this.getAttribute("data-mode")); });
+  });
+  document.getElementById("again").addEventListener("click", function () { start(mode); });
+  document.getElementById("back").addEventListener("click", function () {
+    resultsEl.classList.remove("show");
+    gameEl.classList.remove("show");
+    document.body.className = "";
+    pickerEl.style.display = "block";
+    window.scrollTo(0, 0);
+  });
+})();
+</script>
+</body>
+</html>

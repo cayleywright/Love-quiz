@@ -17,9 +17,30 @@ Everything runs in the browser. Nothing is saved or sent - it all stays on the p
 
 For reflection, not diagnosis.
 
+## More games for Bella-Paige
+
+`games.html` is a little hub of simple, self-contained games that share one
+stylesheet (`style.css`). All client-side, nothing saved:
+
+- **`would-you-rather.html`** - silly rapid-fire choices. Pick a player
+  (Bella-Paige or Chris, in their own colours) for solo play, or "Play
+  Together" so both pick each card and you see where you matched. 12 drawn
+  from a bank each round.
+- **`kind-vs-nice.html`** - sort behaviours into Kind / Just nice / In between,
+  with a gentle "why" after each. Teaches that kind = nice plus noticing a need.
+- **`emotion-detective.html`** - read a face, guess the feeling, see the clues.
+  Runs on emoji now; to use your own pictures, drop files in an `images/`
+  folder and add `src: "images/happy.png"` to the matching emotion in the
+  `EMOTIONS` array at the top of the script.
+- **`calm-corner.html`** - a feelings thermometer (1-10) that suggests a
+  matching action, plus a dragon-breath animation to follow anywhere.
+
+The love quiz links to the hub, and the hub links back to everything.
+
 ## Running it
 
-Open `index.html` in any browser, or visit the published page on GitHub Pages.
+Open `index.html` (or `games.html`) in any browser, or visit the published
+page on GitHub Pages.
 
 ## Publishing
 
