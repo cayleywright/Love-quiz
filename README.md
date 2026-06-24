@@ -22,10 +22,12 @@ For reflection, not diagnosis.
 `games.html` is a little hub of simple, self-contained games that share one
 stylesheet (`style.css`). All client-side, nothing saved:
 
-- **`would-you-rather.html`** - silly rapid-fire choices. Pick a player
-  (Bella-Paige or Chris, in their own colours) for solo play, or "Play
-  Together" so both pick each card and you see where you matched. 12 drawn
-  from a bank each round.
+- **`would-you-rather.html`** - silly rapid-fire choices from a bank of **1000**
+  questions (funny, gross, and some thoughtful), held in `wyr-questions.js`.
+  Add **up to 10 players**, each typing their name and picking their own colour.
+  One player = solo (themed in their colour); two or more = play together, where
+  everyone picks each card with a colour dot and you see who agreed. 12 drawn
+  fresh each round.
 - **`kind-vs-nice.html`** - sort behaviours into Kind / Just nice / In between,
   with a gentle "why" after each. Teaches that kind = nice plus noticing a need.
 - **`emotion-detective.html`** - read a face, guess the feeling, see the clues.
