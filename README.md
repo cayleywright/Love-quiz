@@ -1,59 +1,56 @@
-# The 8 Love Expressions
+# Growth
 
-A lightweight, single-page self-reflection quiz. A start screen lets you choose
-between two versions:
+A small set of simple, self-contained games and quizzes for the family,
+styled to match the wrightops pocket-money app (soft-pink boutique theme:
+white + blush, periwinkle brand, Poppins + Sacramento). Everything runs in the
+browser. Nothing is saved or sent - it all stays on the page.
 
-- **Grown-ups:** 40 statements, rated from "Not at all" to "Very true", then a
-  read on how you give and receive love across eight expressions.
-- **Kids:** 30 simple "would you rather your grown-up..." picks (a hug or a
-  chocolate, a movie together or a tidy room), then a friendly bar graph showing
-  what they love best. The 30 are drawn fresh from a bank of 100 each time, so
-  it rotates and stays fun on replays.
+`index.html` is the **Growth** hub and links to everything. The pages share one
+stylesheet, `style.css`.
 
-The eight expressions: Nurturing Communication, Time Together, Actions, Thoughtful Gifts,
-Physical Affection, Emotional Connection, Intellectual Stimulation and Growth Support.
+## The pages
 
-Everything runs in the browser. Nothing is saved or sent - it all stays on the page.
-
-For reflection, not diagnosis.
-
-## More games for Bella-Paige
-
-`games.html` is a little hub of simple, self-contained games that share one
-stylesheet (`style.css`). All client-side, nothing saved:
-
+- **`index.html`** - the Growth hub (landing page).
 - **`would-you-rather.html`** - silly rapid-fire choices from a bank of **1000**
   questions (funny, gross, and some thoughtful), held in `wyr-questions.js`.
   Add **up to 10 players**, each typing their name and picking their own colour.
-  One player = solo (themed in their colour); two or more = play together, where
-  everyone picks each card with a colour dot and you see who agreed. 20 drawn
-  fresh from the 1000 each round, so it rotates every play.
+  Solo (themed in their colour) or play together with a colour pick-dot per
+  player and an "everyone agreed" tally. 20 drawn fresh each round.
 - **`kind-vs-nice.html`** - sort behaviours into Kind / Just nice / In between,
-  with a gentle "why" after each. Teaches that kind = nice plus noticing a need.
-  60-strong bank, 20 fresh each round.
+  with a gentle "why" after each. 60-strong bank, 20 per round.
 - **`emotion-detective.html`** - read a face, guess the feeling, see the clues.
-  30 emotions, 20 fresh each round. Runs on emoji now; to use your own pictures,
-  drop files in an `images/` folder and add `src: "images/happy.png"` to the
-  matching emotion in the `EMOTIONS` array at the top of the script.
-- **`calm-corner.html`** - a feelings thermometer (1-10) that suggests a
-  matching action, plus a dragon-breath animation to follow anywhere.
+  30 emotions, 20 per round. Runs on emoji now; to use your own pictures, drop
+  files in an `images/` folder and add `src: "images/happy.png"` to the matching
+  emotion in the `EMOTIONS` array.
+- **`calm-corner.html`** - a feelings thermometer (1-10) that suggests a matching
+  action, plus a dragon-breath animation to follow anywhere.
 - **`personality.html`** - "The Five Traits", a personality quiz based on the
-  Big Five (Five-Factor Model). 40 statements (reverse-scored to reduce bias,
-  shuffled each load), then your profile across Openness, Conscientiousness,
-  Extraversion, Agreeableness and Emotional Stability, with a tuned read on
-  where you sit on each. For reflection, not diagnosis.
+  Big Five (Five-Factor Model). 50 statements (10 per trait, reverse-scored,
+  shuffled), then your profile across Openness, Conscientiousness, Extraversion,
+  Agreeableness and Emotional Stability. For reflection, not diagnosis.
+- **`love-quiz.html`** - the 8 Love Expressions quiz (grown-ups + kids versions).
 
-Every game reshuffles its bank on each play, so the questions rotate. The love
-quiz links to the hub, and the hub links back to everything.
+## Theme
+
+`style.css` holds the shared design tokens, matched to pocket-money:
+white background with a blush radial gradient, `--ink #2e2533`, periwinkle brand
+(`--brand #c1c6fc` fills, `--accent #4347a0` text/buttons), rose and dusty-blue
+accents, soft-pink hairlines, rounded cards, Poppins body + Sacramento titles.
 
 ## Running it
 
-Open `index.html` (or `games.html`) in any browser, or visit the published
-page on GitHub Pages.
+Open `index.html` in any browser, or visit the published page on GitHub Pages.
 
 ## Publishing
 
-`index.html` lives at the repo root. To publish on GitHub Pages:
-Settings -> Pages -> Build and deployment -> Source: "Deploy from a branch" ->
-Branch: `main` / `/ (root)` -> Save. The site then serves at
-https://cayleywright.github.io/Love-quiz/
+Served from the repo root on GitHub Pages: Settings -> Pages -> Source:
+"Deploy from a branch" -> Branch: `main` / `/ (root)`.
+
+### Renaming the repo to "growth"
+
+The repo rename happens in GitHub (it can't be done from here):
+Settings -> General -> Repository name -> `growth` -> Rename. GitHub redirects
+the old URLs, but the live Pages address changes from
+`https://cayleywright.github.io/Love-quiz/` to
+`https://cayleywright.github.io/growth/`. Pages stays enabled across the rename;
+just confirm the Source is still `main` / root afterwards.

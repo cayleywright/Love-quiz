@@ -1,25 +1,30 @@
-/* Shared styles for Bella-Paige's games. Calm, warm, kid-friendly. */
+/* Shared styles for Growth. Soft-pink boutique theme, matched to the
+   wrightops pocket-money app: white + blush, periwinkle brand, Poppins +
+   Sacramento. */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sacramento&display=swap');
+
 :root {
-  --bg: #fbf7f4;
+  --bg: #ffffff;
+  --blush: #fbe9ec;        /* soft panel pink */
+  --blush-2: #f6dde1;
   --card: #ffffff;
-  --ink: #2b2535;
-  --muted: #7a7185;
-  --line: #ece4ee;
-  --accent: #c25e7a;
-  --accent-soft: #f6e7ec;
-  --accent-deep: #9c4360;
-  --shadow: 0 10px 30px rgba(60, 40, 55, 0.08);
-  --radius: 16px;
+  --surface: #ffffff;
+  --ink: #2e2533;          /* main text, warm near-black */
+  --muted: #8a6f74;        /* secondary / hint text (AA on white) */
+  --line: #f1e2e4;         /* very soft hairline */
+  --line-strong: #e7cdd1;
 
-  /* Player colours (Would You Rather) */
-  --bp: #b8479b;
-  --bp-soft: #f7e7f4;
-  --bp-deep: #8e3279;
-  --chris: #2f7fc4;
-  --chris-soft: #e3f0fa;
-  --chris-deep: #225e91;
+  --brand: #c1c6fc;        /* light periwinkle - soft fills */
+  --accent: #4347a0;       /* deep periwinkle - buttons, links, emphasis */
+  --accent-soft: #edeefc;  /* light periwinkle wash */
+  --accent-deep: #34367e;  /* hover */
+  --rose: #e3a6ae;         /* decorative rose - bars, swatches */
+  --spend: #9cc4e4;        /* dusty blue */
 
-  /* Feeling scale (Calm Corner) */
+  --shadow: 0 14px 34px rgba(150, 110, 130, 0.12);
+  --radius: 18px;
+
+  /* Right/wrong + feeling scale (used by kind-vs-nice, emotion, calm corner) */
   --calm-green: #5aa86f;
   --calm-yellow: #e0a73a;
   --calm-red: #d05a5a;
@@ -28,9 +33,11 @@
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Poppins", ui-rounded, "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--ink);
-  background: var(--bg);
+  background:
+    radial-gradient(900px 360px at 50% -200px, var(--blush) 0%, transparent 70%),
+    var(--bg);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
@@ -42,19 +49,20 @@ header.hero { text-align: center; padding: 56px 20px 30px; }
   font-weight: 700; color: var(--accent); margin: 0 0 14px;
 }
 .hero h1 {
-  font-size: clamp(30px, 6vw, 44px); line-height: 1.1; margin: 0 0 14px;
-  font-weight: 800; letter-spacing: -0.01em;
+  font-family: "Sacramento", cursive;
+  font-size: clamp(46px, 9vw, 70px); line-height: 1.02; margin: 0 0 12px;
+  font-weight: 400; letter-spacing: 0; color: var(--accent);
 }
 .hero p.lede { max-width: 540px; margin: 0 auto; font-size: 18px; color: var(--muted); }
 
 /* Progress bar */
 .progress-bar {
   position: sticky; top: 0; z-index: 20;
-  background: rgba(251, 247, 244, 0.92); backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.9); backdrop-filter: saturate(1.4) blur(10px);
   padding: 12px 0; border-bottom: 1px solid var(--line);
 }
 .progress-inner { max-width: 720px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; gap: 14px; }
-.track { flex: 1; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.track { flex: 1; height: 8px; background: var(--blush); border-radius: 99px; overflow: hidden; }
 .fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.3s ease; }
 .count { font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; min-width: 56px; text-align: right; }
 
@@ -64,9 +72,9 @@ header.hero { text-align: center; padding: 56px 20px 30px; }
   padding: 22px; margin: 16px 0; box-shadow: var(--shadow);
 }
 .card .num { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
-.card .stem { font-size: 19px; font-weight: 800; margin: 6px 0 18px; }
+.card .stem { font-size: 19px; font-weight: 700; margin: 6px 0 18px; }
 
-/* Choice buttons (2-up, stack on tiny screens) */
+/* Choice buttons */
 .opts { display: flex; gap: 12px; }
 .opts.three { flex-wrap: wrap; }
 .opt {
@@ -74,30 +82,30 @@ header.hero { text-align: center; padding: 56px 20px 30px; }
   padding: 20px 14px; cursor: pointer; font-family: inherit; text-align: center;
   transition: all 0.15s ease; color: var(--ink);
 }
-.opt:hover { border-color: var(--accent); transform: translateY(-2px); }
+.opt:hover { border-color: var(--brand); transform: translateY(-2px); }
 .opt.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
 .opt .emoji { font-size: 34px; display: block; margin-bottom: 8px; }
-.opt .label { font-size: 15px; font-weight: 700; line-height: 1.35; }
+.opt .label { font-size: 15px; font-weight: 600; line-height: 1.35; }
 @media (max-width: 420px) { .card .stem { font-size: 17px; } .opt .label { font-size: 14px; } }
 
-/* Big call-to-action + ghost buttons */
+/* CTA + ghost buttons */
 .cta-zone { text-align: center; margin: 36px 0 8px; }
 button.cta {
   appearance: none; border: none; background: var(--accent); color: #fff;
-  font-size: 18px; font-weight: 700; padding: 16px 40px; border-radius: 99px;
+  font-size: 18px; font-weight: 600; padding: 16px 40px; border-radius: 99px;
   cursor: pointer; box-shadow: var(--shadow);
   transition: transform 0.15s ease, background 0.15s ease, opacity 0.2s ease;
 }
 button.cta:hover:not(:disabled) { background: var(--accent-deep); transform: translateY(-1px); }
-button.cta:disabled { background: #d9cdd4; cursor: not-allowed; box-shadow: none; }
+button.cta:disabled { background: #e4d7dc; color: #fff; cursor: not-allowed; box-shadow: none; }
 .helper { font-size: 14px; color: var(--muted); margin-top: 14px; min-height: 20px; }
 
 button.ghost {
-  appearance: none; background: transparent; border: 1.5px solid var(--line); color: var(--muted);
-  font-weight: 700; font-size: 15px; padding: 12px 26px; border-radius: 99px; cursor: pointer;
+  appearance: none; background: transparent; border: 1.5px solid var(--line-strong); color: var(--muted);
+  font-weight: 600; font-size: 15px; padding: 12px 26px; border-radius: 99px; cursor: pointer;
   transition: all 0.15s ease; margin: 6px;
 }
-button.ghost:hover { border-color: var(--accent); color: var(--accent); }
+button.ghost:hover { border-color: var(--brand); color: var(--accent); }
 .actions { text-align: center; margin: 28px 0; }
 
 /* Chooser / hub grid */
@@ -108,22 +116,22 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); }
   transition: transform 0.15s ease, border-color 0.15s ease; font-family: inherit; text-align: center;
   display: block;
 }
-.choose-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+.choose-card:hover { transform: translateY(-3px); border-color: var(--brand); }
 .choose-card .c-emoji { font-size: 46px; display: block; margin-bottom: 12px; }
-.choose-card .c-label { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+.choose-card .c-label { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
 .choose-card .c-desc { font-size: 14px; color: var(--muted); }
 
 /* Results */
 .results-head { text-align: center; margin: 8px 0 24px; }
-.results-head h2 { font-size: 28px; margin: 0 0 6px; font-weight: 800; }
+.results-head h2 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
 .results-head p { color: var(--muted); margin: 0; }
 .panel {
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 22px; margin: 16px 0; box-shadow: var(--shadow);
 }
-.panel h3 { margin: 0 0 4px; font-size: 20px; }
+.panel h3 { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
 .panel .sub { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
-.big { text-align: center; font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+.big { text-align: center; font-size: 22px; font-weight: 700; margin: 0 0 6px; }
 .big .big-emoji { font-size: 44px; display: block; margin-bottom: 8px; }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .rise { animation: rise 0.5s ease; }

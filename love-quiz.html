@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 8 Love Expressions</title>
+<meta name="description" content="A lightweight take on the 8 Love Expressions framework. 40 quick statements, then see how you give and receive love. Nothing is saved.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sacramento&display=swap">
+<style>
+  :root {
+    --bg: #ffffff;
+    --blush: #fbe9ec;
+    --card: #ffffff;
+    --ink: #2e2533;
+    --muted: #8a6f74;
+    --line: #f1e2e4;
+    --line-strong: #e7cdd1;
+    --brand: #c1c6fc;
+    --accent: #4347a0;
+    --accent-soft: #edeefc;
+    --accent-deep: #34367e;
+    --rose: #e3a6ae;
+    --shadow: 0 14px 34px rgba(150, 110, 130, 0.12);
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "Poppins", ui-rounded, "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(900px 360px at 50% -200px, var(--blush) 0%, transparent 70%),
+      var(--bg);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px 80px; }
+
+  header.hero {
+    text-align: center;
+    padding: 64px 20px 36px;
+  }
+  .hero .kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 14px;
+  }
+  .hero h1 {
+    font-family: "Sacramento", cursive;
+    font-size: clamp(46px, 9vw, 68px);
+    line-height: 1.02;
+    margin: 0 0 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--accent);
+  }
+  .hero p.lede {
+    max-width: 540px;
+    margin: 0 auto;
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  .progress-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(251, 247, 244, 0.92);
+    backdrop-filter: blur(8px);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .progress-inner {
+    max-width: 720px; margin: 0 auto; padding: 0 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .track { flex: 1; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.3s ease; }
+  .count { font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; min-width: 56px; text-align: right; }
+
+  .q {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 22px 18px;
+    margin: 16px 0;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s ease;
+  }
+  .q.answered { border-color: var(--accent-soft); }
+  .q .num { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  .q .text { font-size: 17px; font-weight: 600; margin: 6px 0 16px; }
+
+  .scale { display: flex; gap: 8px; }
+  .scale label {
+    flex: 1;
+    cursor: pointer;
+    text-align: center;
+  }
+  .scale input { position: absolute; opacity: 0; pointer-events: none; }
+  .scale .dot {
+    display: flex; align-items: center; justify-content: center;
+    height: 44px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--muted);
+    background: #fff;
+    transition: all 0.15s ease;
+  }
+  .scale label:hover .dot { border-color: var(--accent); color: var(--accent); }
+  .scale input:checked + .dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .scale-legend {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+    margin-top: 8px; letter-spacing: 0.02em;
+  }
+
+  .cta-zone { text-align: center; margin: 40px 0 8px; }
+  button.cta {
+    appearance: none; border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 18px; font-weight: 700;
+    padding: 16px 40px;
+    border-radius: 99px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, background 0.15s ease, opacity 0.2s ease;
+  }
+  button.cta:hover:not(:disabled) { background: var(--accent-deep); transform: translateY(-1px); }
+  button.cta:disabled { background: #d9cdd4; cursor: not-allowed; box-shadow: none; }
+  .helper { font-size: 14px; color: var(--muted); margin-top: 14px; min-height: 20px; }
+
+  footer.note {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Results */
+  #results { display: none; scroll-margin-top: 80px; }
+  #results.show { display: block; animation: rise 0.5s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .results-head { text-align: center; margin: 8px 0 28px; }
+  .results-head h2 { font-size: 30px; margin: 0 0 8px; font-weight: 800; }
+  .results-head p { color: var(--muted); margin: 0; }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 16px 0;
+    box-shadow: var(--shadow);
+  }
+  .panel h3 { margin: 0 0 4px; font-size: 20px; }
+  .panel .sub { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+
+  .top-list { list-style: none; margin: 0; padding: 0; }
+  .top-list li { margin-bottom: 16px; }
+  .top-list li:last-child { margin-bottom: 0; }
+  .row-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .row-head .name { font-weight: 700; font-size: 16px; }
+  .row-head .pct { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .meter { height: 10px; background: var(--accent-soft); border-radius: 99px; overflow: hidden; }
+  .meter span { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.6s ease; }
+  .row-desc { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+
+  .badge { display: inline-block; background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; font-size: 13px; padding: 4px 12px; border-radius: 99px; margin-bottom: 12px; }
+
+  .actions { text-align: center; margin: 28px 0; }
+  button.ghost {
+    appearance: none;
+    background: transparent;
+    border: 1.5px solid var(--line);
+    color: var(--muted);
+    font-weight: 700; font-size: 15px;
+    padding: 12px 26px;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  button.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .full-grid { list-style: none; margin: 0; padding: 0; }
+  .full-grid li { margin-bottom: 14px; }
+
+  details.exp {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: #fff;
+  }
+  details.exp > summary {
+    cursor: pointer;
+    padding: 14px 16px;
+    font-weight: 700;
+    font-size: 16px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  details.exp > summary::-webkit-details-marker { display: none; }
+  details.exp > summary .rank { color: var(--accent); font-size: 13px; font-weight: 700; }
+  details.exp > summary::after {
+    content: "+";
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1;
+    margin-left: auto;
+  }
+  details.exp[open] > summary::after { content: "\2013"; }
+  details.exp .body { padding: 0 16px 16px; }
+  details.exp .body p.exp-summary { margin: 0 0 14px; color: var(--ink); font-size: 14px; }
+  details.exp .body .ex-label {
+    font-size: 12px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 8px;
+  }
+  details.exp .body ul { margin: 0; padding-left: 18px; }
+  details.exp .body li { font-size: 14px; color: var(--muted); margin-bottom: 7px; }
+
+  /* Chooser */
+  #chooser { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+  #chooser .kicker { text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; font-weight: 700; color: var(--accent); margin: 0 0 14px; }
+  #chooser h1 { font-size: clamp(32px, 6vw, 46px); line-height: 1.1; margin: 0 0 14px; font-weight: 800; letter-spacing: -0.01em; }
+  #chooser p.lede { max-width: 460px; margin: 0 auto 36px; font-size: 18px; color: var(--muted); }
+  .choose-grid { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 560px; }
+  .choose-card {
+    flex: 1 1 220px; background: var(--card); border: 1.5px solid var(--line); border-radius: 20px;
+    padding: 34px 24px; cursor: pointer; box-shadow: var(--shadow);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+    font-family: inherit; text-align: center;
+  }
+  .choose-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .choose-card .emoji { font-size: 46px; display: block; margin-bottom: 12px; }
+  .choose-card .label { font-size: 22px; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+  .choose-card .desc { font-size: 14px; color: var(--muted); }
+
+  /* Kids quiz */
+  .kq {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px; margin: 16px 0; box-shadow: var(--shadow);
+  }
+  .kq .num { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  .kq .stem { font-size: 19px; font-weight: 800; margin: 6px 0 18px; }
+  .kopts { display: flex; gap: 12px; }
+  .kopt {
+    flex: 1; background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+    padding: 20px 14px; cursor: pointer; font-family: inherit; text-align: center;
+    transition: all 0.15s ease; color: var(--ink);
+  }
+  .kopt:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .kopt.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .kopt .kemoji { font-size: 34px; display: block; margin-bottom: 8px; }
+  .kopt .ktext { font-size: 15px; font-weight: 700; line-height: 1.35; }
+  @media (max-width: 420px) { .kq .stem { font-size: 17px; } .kopt .ktext { font-size: 14px; } }
+
+  /* Kids results bar graph */
+  .kbar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .kbar-row .kbar-emoji { font-size: 26px; width: 34px; text-align: center; flex: none; }
+  .kbar-row .kbar-main { flex: 1; }
+  .kbar-row .kbar-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .kbar-row .kbar-name { font-weight: 800; font-size: 16px; }
+  .kbar-row .kbar-count { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .kbar-track { height: 16px; background: var(--accent-soft); border-radius: 99px; overflow: hidden; }
+  .kbar-track span { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.7s ease; }
+  .kbig { text-align: center; font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+  .kbig .kbig-emoji { font-size: 40px; display: block; margin-bottom: 8px; }
+
+  .linkish { appearance: none; background: none; border: none; color: var(--accent); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 8px 0 0; text-decoration: underline; }
+  #kidsResults { display: none; scroll-margin-top: 30px; }
+  #kidsResults.show { display: block; animation: rise 0.5s ease; }
+
+  /* Tie-breaker */
+  .tiebreak-wrap { display: none; }
+  .tiebreak-wrap.show { display: block; animation: rise 0.4s ease; }
+  .tiebreak-intro { text-align: center; margin: 8px 0 18px; }
+  .tiebreak-intro h2 { font-size: 26px; margin: 0 0 6px; font-weight: 800; }
+  .tiebreak-intro p { color: var(--muted); margin: 0; }
+  .kq.tiebreak { border-color: var(--accent-soft); }
+  .kq.tiebreak .num { color: var(--accent-deep); }
+  .kbar-row.winner .kbar-name::after { content: " 👑"; }
+  .kbar-row.winner .kbar-track span { background: var(--accent-deep); }
+</style>
+</head>
+<body>
+
+<section id="chooser">
+  <p class="kicker">The 8 Love Expressions</p>
+  <h1>Who's taking the quiz?</h1>
+  <p class="lede">Pick the version that fits. Nothing is saved - it all stays on this page.</p>
+  <div class="choose-grid">
+    <button class="choose-card" id="chooseAdult">
+      <span class="emoji">💞</span>
+      <span class="label">Grown-ups</span>
+      <span class="desc">40 statements on how you give and receive love.</span>
+    </button>
+    <button class="choose-card" id="chooseKids">
+      <span class="emoji">🧸</span>
+      <span class="label">Kids</span>
+      <span class="desc">30 quick "would you rather" picks. Easy and fun.</span>
+    </button>
+  </div>
+  <p style="margin-top:26px;"><a href="index.html" style="color:var(--accent);font-weight:700;font-size:14px;text-decoration:none;">← Back to Growth</a></p>
+</section>
+
+<div id="adultApp" style="display:none">
+
+<div class="progress-bar" id="progressBar">
+  <div class="progress-inner">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="count" id="count">0 / 40</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">A quick self-reflection</p>
+    <h1>The 8 Love Expressions</h1>
+    <p class="lede">40 quick statements. Rate how true each feels for you, then see how you give and receive love. Nothing is saved - it all stays on this page.</p>
+  </header>
+
+  <main id="quiz"></main>
+
+  <div class="cta-zone">
+    <button class="cta" id="seeResults" disabled>See my results</button>
+    <p class="helper" id="helper">Answer all 40 to unlock your results.</p>
+  </div>
+
+  <section id="results">
+    <div id="adultTiebreak" class="tiebreak-wrap"></div>
+    <div id="adultResultsBody">
+    <div class="results-head">
+      <span class="badge" id="leadBadge"></span>
+      <h2>How you love</h2>
+      <p>Based on how true each statement felt for you.</p>
+    </div>
+
+    <div class="panel">
+      <h3>How you receive love</h3>
+      <p class="sub">The expressions that land most deeply when they come from others.</p>
+      <ul class="top-list" id="receiveList"></ul>
+    </div>
+
+    <div class="panel">
+      <h3>How you give love</h3>
+      <p class="sub">The ways you most naturally show people you care.</p>
+      <ul class="top-list" id="giveList"></ul>
+    </div>
+
+    <div class="panel">
+      <h3>All eight, side by side</h3>
+      <p class="sub">Your overall lean across every expression.</p>
+      <ul class="full-grid" id="fullList"></ul>
+    </div>
+
+    <div class="panel">
+      <h3>Get to know your eight</h3>
+      <p class="sub">A short read on each expression, ordered by your lean, with practical ways to show it. Tap to open.</p>
+      <div id="detailList"></div>
+    </div>
+
+    <div class="actions">
+      <button class="ghost" id="retake">Start over</button>
+    </div>
+    </div>
+  </section>
+
+  <footer class="note">
+    A lightweight take on the 8 Love Expressions framework. For reflection, not diagnosis.
+    <br><button class="linkish" id="adultBack">Back to start</button>
+  </footer>
+
+</div>
+</div>
+
+<div id="kidsApp" style="display:none">
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">For kids</p>
+    <h1>Would You Rather?</h1>
+    <p class="lede">For each one, tap the thing you'd like best. There are no wrong answers!</p>
+  </header>
+
+  <main id="kidsQuiz"></main>
+
+  <div class="cta-zone">
+    <button class="cta" id="kidsSeeResults" disabled>See my answers</button>
+    <p class="helper" id="kidsHelper">Tap one for every question to see your results.</p>
+  </div>
+
+  <section id="kidsResults">
+    <div id="kidsTiebreak" class="tiebreak-wrap"></div>
+    <div id="kidsResultsBody">
+    <div class="results-head">
+      <h2>Here's what you love</h2>
+      <p>The ways you most like to be shown love.</p>
+    </div>
+
+    <div class="panel">
+      <p class="kbig"><span class="kbig-emoji" id="kWinEmoji"></span><span id="kWinName"></span></p>
+      <p class="sub" style="text-align:center" id="kWinLine"></p>
+    </div>
+
+    <div class="panel">
+      <h3>All your picks</h3>
+      <p class="sub">How many times you chose each one.</p>
+      <div id="kBars"></div>
+    </div>
+
+    <div class="actions">
+      <button class="ghost" id="kidsRetake">Play again</button>
+      <button class="ghost" id="kidsBack">Back to start</button>
+    </div>
+    </div>
+  </section>
+
+  <footer class="note">
+    A lightweight take on the 8 Love Expressions framework. Just for fun.
+  </footer>
+
+</div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- Screen chooser (grown-ups vs kids) ----
+  var chooserEl = document.getElementById("chooser");
+  var adultAppEl = document.getElementById("adultApp");
+  var kidsAppEl = document.getElementById("kidsApp");
+
+  function showScreen(which) {
+    chooserEl.style.display = which === "chooser" ? "flex" : "none";
+    adultAppEl.style.display = which === "adult" ? "block" : "none";
+    kidsAppEl.style.display = which === "kids" ? "block" : "none";
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("chooseAdult").addEventListener("click", function () { showScreen("adult"); });
+  document.getElementById("chooseKids").addEventListener("click", function () {
+    kidsResultsEl.classList.remove("show");
+    kidsTiebreakEl.classList.remove("show");
+    kidsTiebreakEl.innerHTML = "";
+    kidsBodyEl.style.display = "block";
+    buildKidsQuiz(); // fresh rotated set each time you enter
+    showScreen("kids");
+  });
+  document.getElementById("adultBack").addEventListener("click", function () { showScreen("chooser"); });
+
+  // Adaptive tie-breaker. When the top expressions are level, ask head-to-head
+  // "which would you pick" questions between just the tied ones, knockout style,
+  // until exactly one is left. optFor(key) -> { emoji, t }. Calls onDone(winner).
+  function runTiebreak(container, contenders, optFor, intro, stem, onDone) {
+    container.innerHTML = "";
+    container.classList.add("show");
+    var queue = contenders.slice();
+    function askNext() {
+      if (queue.length === 1) {
+        container.classList.remove("show");
+        container.innerHTML = "";
+        onDone(queue[0]);
+        return;
+      }
+      var aKey = queue.shift(), bKey = queue.shift();
+      var oa = optFor(aKey), ob = optFor(bKey);
+      container.innerHTML =
+        '<div class="tiebreak-intro"><h2>' + intro.title + '</h2><p>' + intro.sub + '</p></div>' +
+        '<div class="kq tiebreak">' +
+        '<div class="num">Tie-breaker</div>' +
+        '<div class="stem">' + stem + '</div>' +
+        '<div class="kopts">' +
+        '<button class="kopt" data-k="' + aKey + '"><span class="kemoji">' + oa.emoji + '</span><span class="ktext">' + oa.t + '</span></button>' +
+        '<button class="kopt" data-k="' + bKey + '"><span class="kemoji">' + ob.emoji + '</span><span class="ktext">' + ob.t + '</span></button>' +
+        '</div></div>';
+      container.querySelectorAll(".kopt").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          queue.push(this.getAttribute("data-k")); // winner stays in
+          askNext();
+        });
+      });
+      container.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    askNext();
+  }
+
+  // Representative head-to-head options per expression (concrete, one line each).
+  var TIE_ADULT = {
+    communication: { emoji: "💬", t: "Being told clearly that you're loved and appreciated" },
+    time:          { emoji: "⏰", t: "Real, undivided time together" },
+    actions:       { emoji: "🛠️", t: "Having things quietly taken off your plate" },
+    gifts:         { emoji: "🎁", t: "A thoughtful surprise that shows they get you" },
+    touch:         { emoji: "🤗", t: "Physical closeness and affection" },
+    emotional:     { emoji: "💗", t: "Feeling deeply understood and safe" },
+    intellectual:  { emoji: "🧠", t: "Conversations that really make you think" },
+    growth:        { emoji: "📣", t: "Someone backing your goals and growth" }
+  };
+  var TIE_KID = {
+    communication: { emoji: "💫", t: "Tell you you're amazing" },
+    time:          { emoji: "🎲", t: "Spend the whole day with you" },
+    actions:       { emoji: "🛠️", t: "Help you with anything you need" },
+    gifts:         { emoji: "🎁", t: "Surprise you with a present" },
+    touch:         { emoji: "🤗", t: "Give you a big hug" },
+    emotional:     { emoji: "👂", t: "Listen when you're sad" },
+    intellectual:  { emoji: "🧠", t: "Teach you cool things" },
+    growth:        { emoji: "📣", t: "Cheer you on" }
+  };
+
+  // The eight expressions, with short reflective descriptions.
+  var EXPR = {
+    communication: {
+      name: "Nurturing Communication",
+      desc: "Heartfelt words, real conversation and shared humour: feeling close through how you talk and listen.",
+      summary: "Love reaches you through language. Being told clearly and specifically that you matter, having real, unhurried conversation, and sharing a bit of warmth and humour is what makes you feel close and understood.",
+      examples: [
+        "Offer a specific compliment, not a generic 'well done': name the exact thing you admire.",
+        "Leave a note or send a midday message just to say someone is on your mind.",
+        "Put the phone away and give one proper, unhurried conversation.",
+        "Keep things light with a shared joke, especially when the day has been heavy."
+      ]
+    },
+    time: {
+      name: "Time Together",
+      desc: "Quality time and shared experiences: being fully present in each other's company.",
+      summary: "Presence is the gift. Undistracted, unhurried time and shared experiences mean more to you than almost anything: it's about someone being fully there, not just in the same room.",
+      examples: [
+        "Block out time with no screens and nowhere else to be.",
+        "Suggest something new to do together, even something small.",
+        "Be fully present: phone down, properly listening.",
+        "Protect a regular ritual that belongs just to the two of you."
+      ]
+    },
+    actions: {
+      name: "Actions",
+      desc: "Practical help, devotion and quiet sacrifice: love shown through what you do.",
+      summary: "Actions speak loudest. Practical help, dependable follow-through and the willingness to go without so someone else doesn't have to is how love gets proven for you, more than any speech.",
+      examples: [
+        "Notice the task they are dreading and quietly take it off their plate.",
+        "Do the small everyday things without being asked.",
+        "Offer help before they have to ask for it.",
+        "Give up the comfortable option so someone you love can have it."
+      ]
+    },
+    gifts: {
+      name: "Thoughtful Gifts",
+      desc: "Considered gifts, surprises and generosity: tokens that prove you were held in mind.",
+      summary: "It's the thought, never the price. A well-chosen gift or small surprise, something that proves you were listening and held someone in mind, is what carries the meaning.",
+      examples: [
+        "Keep track of the little things they mention wanting.",
+        "Mark an ordinary day with a small, unexpected surprise.",
+        "Choose something personal that shows you really know them.",
+        "Quietly ease a worry, or treat them for no reason at all."
+      ]
+    },
+    touch: {
+      name: "Physical Affection",
+      desc: "Closeness and touch: reassurance and warmth through the body.",
+      summary: "Closeness reassures you. A hug, a hand, sitting near, contact can say what words can't, offering comfort, warmth and a felt sense of safety.",
+      examples: [
+        "Offer a hug or a hand when words won't quite cut it.",
+        "Sit close and lean in during quiet moments.",
+        "Be the one to initiate easy, everyday touch.",
+        "Use a comforting touch when someone is struggling."
+      ]
+    },
+    emotional: {
+      name: "Emotional Connection",
+      desc: "Trust, empathy and support: feeling deeply understood and safe to be yourself.",
+      summary: "You feel loved by being deeply understood. Trust, empathy, emotional safety and steady support, the freedom to come undone and know someone will stay, sit at the heart of it.",
+      examples: [
+        "Ask how they really are, and listen past the automatic 'I'm fine'.",
+        "Hold space for feelings without rushing to fix them.",
+        "Be honest, and let yourself be vulnerable too.",
+        "Show up steadily through the hard stretches, not just the good ones."
+      ]
+    },
+    intellectual: {
+      name: "Intellectual Stimulation",
+      desc: "Stimulating talk, shared learning and curiosity: connecting mind to mind.",
+      summary: "Minds meeting is its own intimacy. Conversations that make you think, learning side by side and genuine curiosity about how each other sees the world keep the connection alive.",
+      examples: [
+        "Start a conversation that genuinely makes them think.",
+        "Learn something new together: a book, a topic, a skill.",
+        "Be curious about their ideas and ask the deeper question.",
+        "Share the fascinating thing you just discovered."
+      ]
+    },
+    growth: {
+      name: "Growth Support",
+      desc: "Encouragement for your goals, health and growth: love that helps you become more yourself.",
+      summary: "Love, for you, helps people grow. Backing each other's goals, health and self-improvement, and standing by them through setbacks, is what makes it feel real.",
+      examples: [
+        "Champion their goals and celebrate the small wins.",
+        "Gently encourage their health and wellbeing.",
+        "Stay in their corner through setbacks, not just successes.",
+        "Make room and time for them to pursue what matters to them."
+      ]
+    }
+  };
+
+  // mode: "r" = how you like to RECEIVE love, "g" = how you GIVE love.
+  var STATEMENTS = [
+    { t: "Being told I look good by my partner genuinely makes my day.", e: "communication", m: "r" },
+    { t: "A kind, out-of-nowhere message from my partner is something I think about all day.", e: "communication", m: "r" },
+    { t: "I need to actually hear that things are good between us - I can't just assume it.", e: "communication", m: "r" },
+    { t: "Telling my partner they look beautiful/handsome comes easily to me.", e: "communication", m: "g" },
+    { t: "When my partner does something well, I make sure they know I noticed.", e: "communication", m: "g" },
+
+    { t: "When my partner puts their phone away and is just fully here, it means everything.", e: "time", m: "r" },
+    { t: "My ideal weekend involves nothing planned, just proper uninterrupted time with my partner.", e: "time", m: "r" },
+    { t: "Trying something new together - even just a different restaurant - makes me feel closer to my partner.", e: "time", m: "r" },
+    { t: "I'll rearrange my week to make sure we actually have real, uninterrupted time together.", e: "time", m: "g" },
+    { t: "When we're spending time together, I'm not half-thinking about my phone or what else I need to do.", e: "time", m: "g" },
+
+    { t: "When my partner sorts something practical without being asked, I feel more loved than if they'd said anything.", e: "actions", m: "r" },
+    { t: "If my partner handles something I was dreading, that means more to me than any compliment.", e: "actions", m: "r" },
+    { t: "If I can see my partner's overwhelmed, I'll quietly sort whatever's causing it.", e: "actions", m: "g" },
+    { t: "I'd rather do something useful for my partner than say something nice.", e: "actions", m: "g" },
+    { t: "I'll happily take things on so my partner doesn't have to worry about them.", e: "actions", m: "g" },
+
+    { t: "When my partner brings me something small because it reminded them of me, I love that.", e: "gifts", m: "r" },
+    { t: "A gift that shows my partner was paying attention means way more to me than something expensive.", e: "gifts", m: "r" },
+    { t: "I keep a mental note of things my partner mentions wanting, even in passing.", e: "gifts", m: "g" },
+    { t: "I love finding an excuse to get my partner something, even when there's no occasion.", e: "gifts", m: "g" },
+    { t: "Surprising my partner with something small, just because, is something I do a lot.", e: "gifts", m: "g" },
+
+    { t: "A hug from my partner when I'm struggling fixes things faster than any conversation.", e: "touch", m: "r" },
+    { t: "If my partner and I haven't been physically close for a while, I feel a distance even when everything's fine.", e: "touch", m: "r" },
+    { t: "I feel most settled when my partner is close - on the couch, in the same room, just near.", e: "touch", m: "r" },
+    { t: "I'm always the one reaching for my partner's hand or pulling them in for a hug.", e: "touch", m: "g" },
+    { t: "Physical affection comes naturally to me - a hand on the back, a kiss, a quick squeeze.", e: "touch", m: "g" },
+
+    { t: "Being able to tell my partner anything, without worrying how they'll react, is the most important thing to me.", e: "emotional", m: "r" },
+    { t: "I need my partner to genuinely get me, not just put up with me.", e: "emotional", m: "r" },
+    { t: "When my partner remembers something I was anxious about and checks in on it, it means everything.", e: "emotional", m: "r" },
+    { t: "When my partner says 'I'm fine', I usually know they're not, and I'll gently push.", e: "emotional", m: "g" },
+    { t: "I can sit with my partner through something hard without needing to fix it or move them on.", e: "emotional", m: "g" },
+
+    { t: "A partner who challenges how I think is what I find genuinely attractive.", e: "intellectual", m: "r" },
+    { t: "I love it when my partner is curious about my actual opinion on something, not just nodding along.", e: "intellectual", m: "r" },
+    { t: "The conversations I value most are the ones where I leave thinking about something differently.", e: "intellectual", m: "r" },
+    { t: "When I find something interesting, my first instinct is to send it straight to my partner.", e: "intellectual", m: "g" },
+    { t: "I love hearing my partner's take on things - they genuinely change how I see stuff sometimes.", e: "intellectual", m: "g" },
+
+    { t: "Having my partner actively in my corner for something I'm working on means more than any pep talk.", e: "growth", m: "r" },
+    { t: "I need a partner who believes in what I'm trying to do and actually shows it.", e: "growth", m: "r" },
+    { t: "I love seeing my partner succeed.", e: "growth", m: "g" },
+    { t: "I'm usually the one nudging my partner to go to the gym, drink more water, get enough sleep.", e: "growth", m: "g" },
+    { t: "When my partner has a goal, I want to be actively involved in helping them get there.", e: "growth", m: "g" }
+  ];
+
+  // Shuffle so the eight expressions aren't presented in grouped blocks
+  // (Fisher-Yates). Each item carries its own expression/mode tag, so order
+  // has no effect on scoring.
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  var ITEMS = shuffle(STATEMENTS.slice());
+
+  var TOTAL = ITEMS.length;
+  var answers = {}; // index -> 1..5
+
+  var quizEl = document.getElementById("quiz");
+  var fillEl = document.getElementById("fill");
+  var countEl = document.getElementById("count");
+  var btn = document.getElementById("seeResults");
+  var helper = document.getElementById("helper");
+  var resultsEl = document.getElementById("results");
+
+  var LEGEND = ["Not at all", "Very true"];
+
+  // Build the question cards.
+  ITEMS.forEach(function (s, i) {
+    var card = document.createElement("div");
+    card.className = "q";
+    card.id = "q" + i;
+
+    var scale = "";
+    for (var v = 1; v <= 5; v++) {
+      scale += '<label>' +
+        '<input type="radio" name="q' + i + '" value="' + v + '">' +
+        '<span class="dot">' + v + '</span>' +
+        '</label>';
+    }
+
+    card.innerHTML =
+      '<div class="num">' + (i + 1) + ' / ' + TOTAL + '</div>' +
+      '<div class="text">' + s.t + '</div>' +
+      '<div class="scale">' + scale + '</div>' +
+      '<div class="scale-legend"><span>' + LEGEND[0] + '</span><span>' + LEGEND[1] + '</span></div>';
+
+    quizEl.appendChild(card);
+
+    card.querySelectorAll('input[type=radio]').forEach(function (input) {
+      input.addEventListener("change", function () {
+        answers[i] = parseInt(this.value, 10);
+        card.classList.add("answered");
+        updateProgress();
+      });
+    });
+  });
+
+  function updateProgress() {
+    var done = Object.keys(answers).length;
+    var pct = Math.round((done / TOTAL) * 100);
+    fillEl.style.width = pct + "%";
+    countEl.textContent = done + " / " + TOTAL;
+    if (done === TOTAL) {
+      btn.disabled = false;
+      helper.textContent = "All done. Reveal your results whenever you're ready.";
+    } else {
+      btn.disabled = true;
+      helper.textContent = "Answer all 40 to unlock your results. (" + (TOTAL - done) + " to go)";
+    }
+  }
+
+  // Average rating per (expression, mode), normalised to a 0-100 percentage.
+  function scoreBy(mode) {
+    var sums = {}, counts = {};
+    Object.keys(EXPR).forEach(function (k) { sums[k] = 0; counts[k] = 0; });
+    ITEMS.forEach(function (s, i) {
+      if (s.m !== mode) return;
+      sums[s.e] += answers[i];
+      counts[s.e] += 1;
+    });
+    return Object.keys(EXPR).map(function (k) {
+      var avg = counts[k] ? sums[k] / counts[k] : 0;
+      return { key: k, pct: Math.round((avg / 5) * 100) };
+    }).sort(function (a, b) { return b.pct - a.pct; });
+  }
+
+  function renderTop(listEl, ranked, topN) {
+    listEl.innerHTML = "";
+    ranked.slice(0, topN).forEach(function (r) {
+      var li = document.createElement("li");
+      li.innerHTML =
+        '<div class="row-head"><span class="name">' + EXPR[r.key].name + '</span>' +
+        '<span class="pct">' + r.pct + '%</span></div>' +
+        '<div class="meter"><span style="width:' + r.pct + '%"></span></div>' +
+        '<p class="row-desc">' + EXPR[r.key].desc + '</p>';
+      listEl.appendChild(li);
+    });
+  }
+
+  function renderFull(listEl, combined) {
+    listEl.innerHTML = "";
+    combined.forEach(function (r) {
+      var li = document.createElement("li");
+      li.innerHTML =
+        '<div class="row-head"><span class="name">' + EXPR[r.key].name + '</span>' +
+        '<span class="pct">' + r.pct + '%</span></div>' +
+        '<div class="meter"><span style="width:' + r.pct + '%"></span></div>';
+      listEl.appendChild(li);
+    });
+  }
+
+  function renderDetails(listEl, combined) {
+    listEl.innerHTML = "";
+    combined.forEach(function (r, idx) {
+      var e = EXPR[r.key];
+      var items = e.examples.map(function (x) { return '<li>' + x + '</li>'; }).join("");
+      var det = document.createElement("details");
+      det.className = "exp";
+      if (idx === 0) det.open = true;
+      det.innerHTML =
+        '<summary><span class="name">' + e.name + '</span>' +
+        '<span class="rank">' + r.pct + '%</span></summary>' +
+        '<div class="body">' +
+        '<p class="exp-summary">' + e.summary + '</p>' +
+        '<p class="ex-label">Ways to show it</p>' +
+        '<ul>' + items + '</ul>' +
+        '</div>';
+      listEl.appendChild(det);
+    });
+  }
+
+  var adultTiebreakEl = document.getElementById("adultTiebreak");
+  var adultBodyEl = document.getElementById("adultResultsBody");
+
+  btn.addEventListener("click", function () {
+    if (Object.keys(answers).length !== TOTAL) return;
+
+    var receive = scoreBy("r");
+    var give = scoreBy("g");
+
+    // Combined overall lean across both modes.
+    var combinedMap = {};
+    Object.keys(EXPR).forEach(function (k) { combinedMap[k] = []; });
+    receive.concat(give).forEach(function (r) { combinedMap[r.key].push(r.pct); });
+    var combined = Object.keys(EXPR).map(function (k) {
+      var arr = combinedMap[k];
+      var avg = arr.reduce(function (a, b) { return a + b; }, 0) / arr.length;
+      return { key: k, pct: Math.round(avg) };
+    }).sort(function (a, b) { return b.pct - a.pct; });
+
+    function finish(winnerKey) {
+      // Make the winner unambiguous: lift it to the front and ensure it sits
+      // strictly above the rest of the (previously tied) top.
+      var topPct = combined[0].pct;
+      combined.sort(function (a, b) {
+        if (a.key === winnerKey) return -1;
+        if (b.key === winnerKey) return 1;
+        return b.pct - a.pct;
+      });
+      if (combined.length > 1 && combined[0].pct <= combined[1].pct) {
+        combined[0] = { key: winnerKey, pct: Math.min(100, topPct + 1) };
+      }
+
+      document.getElementById("leadBadge").textContent = "Your strongest: " + EXPR[winnerKey].name;
+      renderTop(document.getElementById("receiveList"), receive, 3);
+      renderTop(document.getElementById("giveList"), give, 3);
+      renderFull(document.getElementById("fullList"), combined);
+      renderDetails(document.getElementById("detailList"), combined);
+      adultBodyEl.style.display = "block";
+      resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    resultsEl.classList.add("show");
+
+    // Adaptive tie-breaker if the top is level.
+    var topPct = combined[0].pct;
+    var tied = combined.filter(function (c) { return c.pct === topPct; }).map(function (c) { return c.key; });
+    if (tied.length > 1) {
+      adultBodyEl.style.display = "none";
+      runTiebreak(adultTiebreakEl, tied, function (k) { return TIE_ADULT[k]; },
+        { title: "It's close - one tie-breaker", sub: "A few of your expressions came out level. Pick which means more." },
+        "Which means more to you?", finish);
+    } else {
+      adultBodyEl.style.display = "block";
+      finish(combined[0].key);
+    }
+  });
+
+  document.getElementById("retake").addEventListener("click", function () {
+    answers = {};
+    resultsEl.classList.remove("show");
+    adultTiebreakEl.classList.remove("show");
+    adultTiebreakEl.innerHTML = "";
+    adultBodyEl.style.display = "block";
+    document.querySelectorAll('input[type=radio]').forEach(function (i) { i.checked = false; });
+    document.querySelectorAll('.q').forEach(function (c) { c.classList.remove("answered"); });
+    updateProgress();
+    adultAppEl.querySelector("header.hero").scrollIntoView({ behavior: "smooth" });
+  });
+
+  updateProgress();
+
+  // ================= KIDS QUIZ =================
+  // Kid-friendly names + emoji for each expression.
+  var KID = {
+    communication: { name: "Kind Words", emoji: "💬" },
+    time:          { name: "Time Together", emoji: "🎲" },
+    actions:       { name: "Helping You", emoji: "🛠️" },
+    gifts:         { name: "Treats & Surprises", emoji: "🎁" },
+    touch:         { name: "Hugs & Cuddles", emoji: "🤗" },
+    emotional:     { name: "Listening & Caring", emoji: "👂" },
+    intellectual:  { name: "Learning Together", emoji: "🧠" },
+    growth:        { name: "Cheering You On", emoji: "📣" }
+  };
+
+  // A bank of 25 concrete options per expression. Each session, a balanced
+  // set of 100 forced-choice questions is built from these, then 30 are
+  // picked at random - so the quiz rotates and feels fresh every time.
+  var KID_POOL = {
+    communication: [
+      { emoji: "🌟", t: "Tell you they're proud of you" },
+      { emoji: "❤️", t: "Say 'I love you'" },
+      { emoji: "💫", t: "Tell you you're amazing" },
+      { emoji: "👏", t: "Tell you you did a great job" },
+      { emoji: "🥰", t: "Tell you you're their favourite" },
+      { emoji: "💞", t: "Tell you you're loved" },
+      { emoji: "😊", t: "Say something kind to you" },
+      { emoji: "⭐", t: "Tell you you're special" },
+      { emoji: "🏅", t: "Tell you you're the best" },
+      { emoji: "🤫", t: "Whisper a secret 'I love you'" },
+      { emoji: "😄", t: "Tell you how funny you are" },
+      { emoji: "🌈", t: "Say you make them so happy" },
+      { emoji: "🦁", t: "Tell you you're brave" },
+      { emoji: "🙌", t: "Tell you they believe in you" },
+      { emoji: "☀️", t: "Say 'you're my sunshine'" },
+      { emoji: "🎵", t: "Sing you a happy song" },
+      { emoji: "📖", t: "Tell you a bedtime story" },
+      { emoji: "🌅", t: "Say good morning with a big smile" },
+      { emoji: "💝", t: "Tell you you're kind" },
+      { emoji: "🎙️", t: "Leave you a sweet voice message" },
+      { emoji: "🥹", t: "Tell you they missed you" },
+      { emoji: "🫶", t: "Say 'I'm so glad you're mine'" },
+      { emoji: "🌻", t: "Tell you you're growing up so well" },
+      { emoji: "🎊", t: "Cheer 'hooray!' for you" },
+      { emoji: "🌷", t: "Tell you you're wonderful" }
+    ],
+    time: [
+      { emoji: "🎲", t: "Play your favourite game with you" },
+      { emoji: "🛝", t: "Take you to the park" },
+      { emoji: "🌞", t: "Spend the whole day with you" },
+      { emoji: "🍿", t: "Watch a movie together" },
+      { emoji: "🏰", t: "Build a fort together" },
+      { emoji: "🧁", t: "Bake something together" },
+      { emoji: "🗺️", t: "Go on an adventure together" },
+      { emoji: "🚲", t: "Ride bikes together" },
+      { emoji: "🏖️", t: "Go to the beach together" },
+      { emoji: "🌳", t: "Play in the garden with you" },
+      { emoji: "✂️", t: "Do a craft with you" },
+      { emoji: "🧺", t: "Have a picnic together" },
+      { emoji: "🏊", t: "Go swimming with you" },
+      { emoji: "🙈", t: "Play hide and seek" },
+      { emoji: "💃", t: "Dance around the room with you" },
+      { emoji: "🚶", t: "Go for a walk together" },
+      { emoji: "🏕️", t: "Camp in the backyard" },
+      { emoji: "♟️", t: "Play board games all afternoon" },
+      { emoji: "🎠", t: "Go to the playground" },
+      { emoji: "🃏", t: "Make up a game together" },
+      { emoji: "🪁", t: "Fly a kite together" },
+      { emoji: "🐘", t: "Go to the zoo together" },
+      { emoji: "🎬", t: "Have a movie night with popcorn" },
+      { emoji: "🧱", t: "Build something with blocks together" },
+      { emoji: "🌧️", t: "Splash in puddles together" }
+    ],
+    actions: [
+      { emoji: "🧹", t: "Tidy your room for you" },
+      { emoji: "🍝", t: "Make your favourite dinner" },
+      { emoji: "🔧", t: "Fix your broken toy" },
+      { emoji: "🎒", t: "Pack your school bag for you" },
+      { emoji: "✏️", t: "Help you with your homework" },
+      { emoji: "🍎", t: "Make you a yummy snack" },
+      { emoji: "💼", t: "Carry your bag when you're tired" },
+      { emoji: "🛁", t: "Run you a warm bath" },
+      { emoji: "👕", t: "Help you get dressed quickly" },
+      { emoji: "👟", t: "Tie your shoelaces" },
+      { emoji: "🥤", t: "Pour you a cold drink" },
+      { emoji: "🧼", t: "Help you clean up your mess" },
+      { emoji: "🍳", t: "Make you breakfast in bed" },
+      { emoji: "🔍", t: "Help you find your lost toy" },
+      { emoji: "🍏", t: "Cut up your apple" },
+      { emoji: "💇", t: "Brush your hair" },
+      { emoji: "🧖", t: "Warm up your towel" },
+      { emoji: "🪥", t: "Help you brush your teeth" },
+      { emoji: "👚", t: "Get your clothes ready for tomorrow" },
+      { emoji: "📦", t: "Help you carry something heavy" },
+      { emoji: "💧", t: "Fill your water bottle" },
+      { emoji: "🥪", t: "Make you a sandwich" },
+      { emoji: "🪜", t: "Help you reach something high" },
+      { emoji: "👔", t: "Iron your school uniform" },
+      { emoji: "🧽", t: "Help you finish your chores" }
+    ],
+    gifts: [
+      { emoji: "🍫", t: "Buy you a chocolate" },
+      { emoji: "🎁", t: "Surprise you with a present" },
+      { emoji: "💌", t: "Leave a surprise note in your bag" },
+      { emoji: "🍦", t: "Get you an ice cream" },
+      { emoji: "🧸", t: "Bring you a little toy" },
+      { emoji: "🎈", t: "Give you a balloon" },
+      { emoji: "🍪", t: "Bring home a treat just for you" },
+      { emoji: "🍬", t: "Buy you some lollies" },
+      { emoji: "🖍️", t: "Get you a new colouring book" },
+      { emoji: "🏷️", t: "Surprise you with a sticker pack" },
+      { emoji: "🌸", t: "Bring you flowers" },
+      { emoji: "🍩", t: "Get you a doughnut" },
+      { emoji: "📕", t: "Buy you a new book" },
+      { emoji: "🪙", t: "Give you a shiny coin" },
+      { emoji: "🛍️", t: "Bring you a surprise from the shops" },
+      { emoji: "🚗", t: "Get you a toy car" },
+      { emoji: "🎀", t: "Wrap up a fun surprise" },
+      { emoji: "🍭", t: "Get you a lollipop" },
+      { emoji: "📗", t: "Bring you a comic book" },
+      { emoji: "🎮", t: "Surprise you with a new game" },
+      { emoji: "🪀", t: "Get you a yo-yo" },
+      { emoji: "🧊", t: "Buy you a slushie" },
+      { emoji: "💎", t: "Give you a treasure box" },
+      { emoji: "🎩", t: "Get you a fun hat" },
+      { emoji: "🥚", t: "Get you a chocolate egg" }
+    ],
+    touch: [
+      { emoji: "🤗", t: "Give you a big hug" },
+      { emoji: "🛋️", t: "Have a cuddle on the couch" },
+      { emoji: "😴", t: "Give you a goodnight kiss" },
+      { emoji: "🐴", t: "Give you a piggyback ride" },
+      { emoji: "🤝", t: "Hold your hand" },
+      { emoji: "🛏️", t: "Tuck you in tight" },
+      { emoji: "🙌", t: "Do a high five and a big squeeze" },
+      { emoji: "🐻", t: "Give you a big bear hug" },
+      { emoji: "🧣", t: "Snuggle under a blanket" },
+      { emoji: "💋", t: "Give you a kiss on the forehead" },
+      { emoji: "🤸", t: "Carry you on their shoulders" },
+      { emoji: "🌄", t: "Give you a morning cuddle" },
+      { emoji: "😪", t: "Hold you when you're tired" },
+      { emoji: "💤", t: "Rub your back until you sleep" },
+      { emoji: "🌯", t: "Wrap you in a big hug" },
+      { emoji: "✋", t: "Give you a high five" },
+      { emoji: "👊", t: "Give you a knuckle bump" },
+      { emoji: "🐨", t: "Give you a big snuggle" },
+      { emoji: "👋", t: "Give you a kiss goodbye" },
+      { emoji: "🖐️", t: "Pat your head gently" },
+      { emoji: "🤱", t: "Rock you in their arms" },
+      { emoji: "😂", t: "Give you a tickle and a hug" },
+      { emoji: "⛈️", t: "Hold you close in a storm" },
+      { emoji: "😘", t: "Tuck you in with a kiss" },
+      { emoji: "🦖", t: "Give you a giant hug" }
+    ],
+    emotional: [
+      { emoji: "👂", t: "Listen when you're upset" },
+      { emoji: "🗣️", t: "Ask all about your day" },
+      { emoji: "🫂", t: "Give you a squeeze when you're sad" },
+      { emoji: "🌙", t: "Sit with you when you're scared" },
+      { emoji: "💗", t: "Listen to how you're feeling" },
+      { emoji: "🤍", t: "Help you when you're worried" },
+      { emoji: "🩹", t: "Make you feel better" },
+      { emoji: "💭", t: "Stay with you after a bad dream" },
+      { emoji: "🧘", t: "Help you feel calm" },
+      { emoji: "😤", t: "Understand when you're grumpy" },
+      { emoji: "💬", t: "Talk to you about your worries" },
+      { emoji: "😢", t: "Wipe your tears away" },
+      { emoji: "😠", t: "Give you a hug when you're angry" },
+      { emoji: "🤲", t: "Sit quietly with you" },
+      { emoji: "🗨️", t: "Help you say how you feel" },
+      { emoji: "🥺", t: "Notice when you're sad" },
+      { emoji: "🤕", t: "Comfort you when you're hurt" },
+      { emoji: "🛟", t: "Help you feel safe" },
+      { emoji: "💧", t: "Be there when you cry" },
+      { emoji: "🌬️", t: "Help you calm down" },
+      { emoji: "🙂", t: "Help you feel happy again" },
+      { emoji: "💛", t: "Ask if you're okay" },
+      { emoji: "🌥️", t: "Help you through a hard day" },
+      { emoji: "🕰️", t: "Always make time to listen" },
+      { emoji: "💖", t: "Understand exactly how you feel" }
+    ],
+    intellectual: [
+      { emoji: "🔬", t: "Teach you something cool" },
+      { emoji: "❓", t: "Answer your big questions" },
+      { emoji: "🧩", t: "Show you how something works" },
+      { emoji: "📚", t: "Read a fact book with you" },
+      { emoji: "🧠", t: "Do a tricky puzzle with you" },
+      { emoji: "🔵", t: "Explain why the sky is blue" },
+      { emoji: "✨", t: "Help you learn something new" },
+      { emoji: "🧪", t: "Show you a fun science trick" },
+      { emoji: "🔤", t: "Teach you a new word" },
+      { emoji: "🔢", t: "Do a maths game with you" },
+      { emoji: "🔨", t: "Show you how to build something" },
+      { emoji: "🐾", t: "Teach you about animals" },
+      { emoji: "📘", t: "Help you read a tricky book" },
+      { emoji: "🤔", t: "Answer 'why' about everything" },
+      { emoji: "🔭", t: "Show you the stars and planets" },
+      { emoji: "🎨", t: "Teach you how to draw something" },
+      { emoji: "⚙️", t: "Explore how things work together" },
+      { emoji: "🪄", t: "Show you a cool magic trick" },
+      { emoji: "🧐", t: "Help you solve a riddle" },
+      { emoji: "🚀", t: "Teach you something about space" },
+      { emoji: "🌿", t: "Show you how seeds grow" },
+      { emoji: "⚗️", t: "Do an experiment with you" },
+      { emoji: "💯", t: "Teach you to count to 100" },
+      { emoji: "🔡", t: "Help you learn your letters" },
+      { emoji: "🌦️", t: "Show you how a rainbow forms" }
+    ],
+    growth: [
+      { emoji: "📣", t: "Cheer you on at your game" },
+      { emoji: "💪", t: "Say 'you can do it!' when it's hard" },
+      { emoji: "⚽", t: "Practise with you so you get better" },
+      { emoji: "🌱", t: "Tell you to keep trying" },
+      { emoji: "🎯", t: "Help you reach a goal" },
+      { emoji: "🔥", t: "Tell you to never give up" },
+      { emoji: "🎉", t: "Be your biggest fan" },
+      { emoji: "🏆", t: "Help you get better at something" },
+      { emoji: "📢", t: "Cheer the loudest for you" },
+      { emoji: "🏀", t: "Help you practise your sport" },
+      { emoji: "🦸", t: "Help you be brave" },
+      { emoji: "🏃", t: "Cheer at your race" },
+      { emoji: "🧗", t: "Help you learn something hard" },
+      { emoji: "👍", t: "Tell you you've got this" },
+      { emoji: "🥳", t: "Cheer when you do something new" },
+      { emoji: "🛡️", t: "Help you not give up" },
+      { emoji: "🔁", t: "Encourage you to try again" },
+      { emoji: "🥇", t: "Be proud when you try hard" },
+      { emoji: "📅", t: "Help you practise every day" },
+      { emoji: "🎻", t: "Cheer you on at your recital" },
+      { emoji: "🌠", t: "Help you chase your dreams" },
+      { emoji: "🥊", t: "Always be in your corner" },
+      { emoji: "🎊", t: "Celebrate when you succeed" },
+      { emoji: "📝", t: "Help you make a plan" },
+      { emoji: "💥", t: "Tell you how strong you are" }
+    ]
+  };
+
+  var KID_ORDER = ["communication", "time", "actions", "gifts", "touch", "emotional", "intellectual", "growth"];
+  // Each pattern pairs all 8 expressions once; rotating patterns vary the
+  // matchups. Using phrase index i for both sides means every expression's
+  // 25 options each appear exactly once -> a perfectly balanced 100-question bank.
+  var KID_PATTERNS = [
+    [[0, 1], [2, 3], [4, 5], [6, 7]],
+    [[0, 2], [1, 4], [3, 6], [5, 7]],
+    [[0, 4], [1, 6], [2, 7], [3, 5]],
+    [[0, 7], [1, 3], [2, 5], [4, 6]]
+  ];
+  function buildKidBank() {
+    var bank = [];
+    for (var i = 0; i < 25; i++) {
+      KID_PATTERNS[i % 4].forEach(function (pair) {
+        var ea = KID_ORDER[pair[0]], eb = KID_ORDER[pair[1]];
+        bank.push({
+          a: { e: ea, emoji: KID_POOL[ea][i].emoji, t: KID_POOL[ea][i].t },
+          b: { e: eb, emoji: KID_POOL[eb][i].emoji, t: KID_POOL[eb][i].t }
+        });
+      });
+    }
+    return bank;
+  }
+  var KIDBANK = buildKidBank();
+  var KTOTAL = 30; // how many of the 100 are shown each play
+
+  var kidsQuizEl = document.getElementById("kidsQuiz");
+  var kidsBtn = document.getElementById("kidsSeeResults");
+  var kidsHelper = document.getElementById("kidsHelper");
+  var kidsResultsEl = document.getElementById("kidsResults");
+  var kidPicks = {}; // qIndex -> expression key
+
+  // Pick a fresh random set of KTOTAL questions and (re)build the cards.
+  function buildKidsQuiz() {
+    kidPicks = {};
+    kidsQuizEl.innerHTML = "";
+    var set = shuffle(KIDBANK.slice()).slice(0, KTOTAL).map(function (q) {
+      // Randomly flip which option is on the left so it isn't predictable.
+      return Math.random() < 0.5 ? { a: q.b, b: q.a } : { a: q.a, b: q.b };
+    });
+
+    set.forEach(function (q, i) {
+      var card = document.createElement("div");
+      card.className = "kq";
+      card.id = "kq" + i;
+      card.innerHTML =
+        '<div class="num">' + (i + 1) + ' / ' + KTOTAL + '</div>' +
+        '<div class="stem">Would you rather your grown-up...</div>' +
+        '<div class="kopts">' +
+          '<button class="kopt" data-opt="a"><span class="kemoji">' + q.a.emoji + '</span><span class="ktext">' + q.a.t + '</span></button>' +
+          '<button class="kopt" data-opt="b"><span class="kemoji">' + q.b.emoji + '</span><span class="ktext">' + q.b.t + '</span></button>' +
+        '</div>';
+      kidsQuizEl.appendChild(card);
+
+      card.querySelectorAll(".kopt").forEach(function (optBtn) {
+        optBtn.addEventListener("click", function () {
+          var which = this.getAttribute("data-opt");
+          kidPicks[i] = q[which].e;
+          card.querySelectorAll(".kopt").forEach(function (o) { o.classList.remove("sel"); });
+          this.classList.add("sel");
+          updateKidsProgress();
+        });
+      });
+    });
+    updateKidsProgress();
+  }
+
+  function updateKidsProgress() {
+    var done = Object.keys(kidPicks).length;
+    if (done === KTOTAL) {
+      kidsBtn.disabled = false;
+      kidsHelper.textContent = "All done! Tap the button to see your results.";
+    } else {
+      kidsBtn.disabled = true;
+      kidsHelper.textContent = "Tap one for every question. (" + (KTOTAL - done) + " to go)";
+    }
+  }
+
+  var kidsTiebreakEl = document.getElementById("kidsTiebreak");
+  var kidsBodyEl = document.getElementById("kidsResultsBody");
+
+  function renderKidsResults(counts, winnerKey) {
+    var ranked = Object.keys(KID).map(function (k) {
+      return { key: k, n: counts[k] };
+    }).sort(function (a, b) {
+      if (a.key === winnerKey) return -1;
+      if (b.key === winnerKey) return 1;
+      return b.n - a.n;
+    });
+
+    var max = ranked.reduce(function (m, r) { return Math.max(m, r.n); }, 0) || 1;
+    document.getElementById("kWinEmoji").textContent = KID[winnerKey].emoji;
+    document.getElementById("kWinName").textContent = KID[winnerKey].name;
+    document.getElementById("kWinLine").textContent =
+      "You love " + KID[winnerKey].name.toLowerCase() + " best!";
+
+    var barsEl = document.getElementById("kBars");
+    barsEl.innerHTML = "";
+    ranked.forEach(function (r) {
+      var pct = Math.round((r.n / max) * 100);
+      var row = document.createElement("div");
+      row.className = "kbar-row" + (r.key === winnerKey ? " winner" : "");
+      row.innerHTML =
+        '<div class="kbar-emoji">' + KID[r.key].emoji + '</div>' +
+        '<div class="kbar-main">' +
+          '<div class="kbar-head"><span class="kbar-name">' + KID[r.key].name + '</span>' +
+          '<span class="kbar-count">' + r.n + '</span></div>' +
+          '<div class="kbar-track"><span style="width:' + pct + '%"></span></div>' +
+        '</div>';
+      barsEl.appendChild(row);
+    });
+
+    kidsBodyEl.style.display = "block";
+    kidsResultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  kidsBtn.addEventListener("click", function () {
+    if (Object.keys(kidPicks).length !== KTOTAL) return;
+
+    var counts = {};
+    Object.keys(KID).forEach(function (k) { counts[k] = 0; });
+    Object.keys(kidPicks).forEach(function (i) { counts[kidPicks[i]] += 1; });
+
+    var maxN = Object.keys(counts).reduce(function (m, k) { return Math.max(m, counts[k]); }, 0);
+    var tied = Object.keys(KID).filter(function (k) { return counts[k] === maxN; });
+
+    kidsResultsEl.classList.add("show");
+
+    if (tied.length > 1) {
+      kidsBodyEl.style.display = "none";
+      runTiebreak(kidsTiebreakEl, tied, function (k) { return TIE_KID[k]; },
+        { title: "So close! One more pick", sub: "A few were tied. Choose your favourite to find the winner." },
+        "Which would you pick?", function (winnerKey) {
+          renderKidsResults(counts, winnerKey);
+        });
+    } else {
+      kidsBodyEl.style.display = "block";
+      renderKidsResults(counts, tied[0]);
+    }
+  });
+
+  document.getElementById("kidsRetake").addEventListener("click", function () {
+    kidsResultsEl.classList.remove("show");
+    kidsTiebreakEl.classList.remove("show");
+    kidsTiebreakEl.innerHTML = "";
+    kidsBodyEl.style.display = "block";
+    buildKidsQuiz(); // fresh set of questions each play
+    kidsAppEl.querySelector("header.hero").scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("kidsBack").addEventListener("click", function () {
+    showScreen("chooser");
+  });
+
+  buildKidsQuiz();
+})();
+</script>
+</body>
+</html>
