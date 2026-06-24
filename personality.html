@@ -55,7 +55,7 @@
 <div class="progress-bar">
   <div class="progress-inner">
     <div class="track"><div class="fill" id="fill"></div></div>
-    <div class="count" id="count">0 / 40</div>
+    <div class="count" id="count">0 / 50</div>
   </div>
 </div>
 
@@ -63,14 +63,14 @@
   <header class="hero">
     <p class="kicker">A personality quiz</p>
     <h1>The Five Traits</h1>
-    <p class="lede">Forty statements. Rate how much each sounds like you, then see your profile across the five traits psychologists use to describe personality. Nothing is saved - it all stays on this page.</p>
+    <p class="lede">Fifty statements. Rate how much each sounds like you, then see your profile across the five traits psychologists use to describe personality. Nothing is saved - it all stays on this page.</p>
   </header>
 
   <main id="quiz"></main>
 
   <div class="cta-zone">
     <button class="cta" id="seeResults" disabled>See my profile</button>
-    <p class="helper" id="helper">Answer all 40 to unlock your profile.</p>
+    <p class="helper" id="helper">Answer all 50 to unlock your profile.</p>
   </div>
 
   <section id="results">
@@ -158,6 +158,8 @@
     { t: "I prefer routines and familiar things to surprises.", e: "openness", k: -1 },
     { t: "Abstract or theoretical ideas don't really interest me.", e: "openness", k: -1 },
     { t: "I'm not all that into art or poetry.", e: "openness", k: -1 },
+    { t: "I'm more practical than creative.", e: "openness", k: -1 },
+    { t: "New or unusual ideas tend to leave me cold.", e: "openness", k: -1 },
 
     { t: "I like to have a plan and tick things off it.", e: "conscientiousness", k: 1 },
     { t: "People can count on me to follow through on what I say.", e: "conscientiousness", k: 1 },
@@ -167,6 +169,8 @@
     { t: "I often leave things until the last minute.", e: "conscientiousness", k: -1 },
     { t: "I can be a bit careless with details.", e: "conscientiousness", k: -1 },
     { t: "My space tends to be messy and disorganised.", e: "conscientiousness", k: -1 },
+    { t: "I get distracted and drift off task easily.", e: "conscientiousness", k: -1 },
+    { t: "I'm not very bothered about being on time.", e: "conscientiousness", k: -1 },
 
     { t: "Being around people gives me energy.", e: "extraversion", k: 1 },
     { t: "I'm happy to be the one who starts a conversation.", e: "extraversion", k: 1 },
@@ -176,6 +180,8 @@
     { t: "Too much socialising drains me and I need to retreat.", e: "extraversion", k: -1 },
     { t: "I'd usually rather stay in than go out.", e: "extraversion", k: -1 },
     { t: "I tend to stay quiet in groups.", e: "extraversion", k: -1 },
+    { t: "I need plenty of quiet time to myself.", e: "extraversion", k: -1 },
+    { t: "Making small talk with strangers tires me out.", e: "extraversion", k: -1 },
 
     { t: "I feel other people's emotions almost as if they were my own.", e: "agreeableness", k: 1 },
     { t: "I go out of my way to make people feel at ease.", e: "agreeableness", k: 1 },
@@ -185,15 +191,19 @@
     { t: "I can be blunt, even if it stings a little.", e: "agreeableness", k: -1 },
     { t: "I'm a bit sceptical of people's motives.", e: "agreeableness", k: -1 },
     { t: "I put my own needs first more often than not.", e: "agreeableness", k: -1 },
+    { t: "I don't mind a bit of conflict to get my way.", e: "agreeableness", k: -1 },
+    { t: "I can be quite critical of other people.", e: "agreeableness", k: -1 },
 
     { t: "I stay calm and steady when things get stressful.", e: "stability", k: 1 },
     { t: "I bounce back quickly after a setback.", e: "stability", k: 1 },
     { t: "It takes a lot to rattle me.", e: "stability", k: 1 },
     { t: "I rarely lie awake worrying.", e: "stability", k: 1 },
+    { t: "I keep a level head in a crisis.", e: "stability", k: 1 },
     { t: "My mood can swing quite easily.", e: "stability", k: -1 },
     { t: "I worry about things more than most people do.", e: "stability", k: -1 },
     { t: "Small frustrations can really get under my skin.", e: "stability", k: -1 },
-    { t: "I often feel tense or on edge.", e: "stability", k: -1 }
+    { t: "I often feel tense or on edge.", e: "stability", k: -1 },
+    { t: "I get stressed more easily than most people.", e: "stability", k: -1 }
   ];
 
   function shuffle(a) {
@@ -247,7 +257,7 @@
       helper.textContent = "All done. See your profile whenever you're ready.";
     } else {
       btn.disabled = true;
-      helper.textContent = "Answer all 40 to unlock your profile. (" + (TOTAL - done) + " to go)";
+      helper.textContent = "Answer all " + TOTAL + " to unlock your profile. (" + (TOTAL - done) + " to go)";
     }
   }
 
