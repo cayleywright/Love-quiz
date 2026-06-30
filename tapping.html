@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tapping Journeys · Growth</title>
+<meta name="description" content="Gentle continuous EFT (tapping) journeys to listen to or read - for calm, presence, and feeling a little more at home in yourself. Nothing is saved.">
+<link rel="stylesheet" href="style.css">
+<style>
+  .intro-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px 22px; margin: 6px 0 22px; box-shadow: var(--shadow); color: var(--muted);
+    font-size: 15px;
+  }
+  .intro-card strong { color: var(--ink); }
+  .journey { animation: rise .4s ease; }
+  .journey h3 { margin: 0 0 2px; font-size: 21px; font-weight: 700; color: var(--ink); }
+  .journey .sub { color: var(--accent); font-weight: 700; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; margin: 0 0 8px; }
+  .journey .blurb { color: var(--muted); font-size: 15px; margin: 0 0 14px; }
+  .journey audio { width: 100%; margin: 2px 0 6px; }
+  .pending { font-size: 13px; color: var(--muted); font-style: italic; margin: 2px 0 6px; }
+  details.script { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
+  details.script > summary {
+    cursor: pointer; font-weight: 700; color: var(--accent); font-size: 14px; list-style: none;
+  }
+  details.script > summary::-webkit-details-marker { display: none; }
+  details.script > summary::before { content: "▸ "; }
+  details.script[open] > summary::before { content: "▾ "; }
+  .script-body {
+    max-height: 460px; overflow-y: auto; margin-top: 12px; padding-right: 8px;
+    font-size: 15px; line-height: 1.7;
+  }
+  .script-body .ln { margin: 0 0 6px; }
+  .script-body .cue { color: var(--muted); font-style: italic; }
+  .script-body .point { color: var(--accent); font-weight: 700; margin-top: 12px; }
+  .script-body .round { font-weight: 700; color: var(--ink); margin: 18px 0 4px; letter-spacing: .04em; }
+  .script-body .rule { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
+  .script-body .title { font-weight: 700; font-size: 17px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <p class="kicker">For grown-ups</p>
+    <h1>Tapping Journeys</h1>
+    <p class="lede">Gentle continuous EFT (tapping) sessions to listen to or read - for calm, presence, and feeling a little more at home in yourself.</p>
+  </header>
+
+  <div class="intro-card">
+    <strong>New to tapping?</strong> EFT is gentle fingertip tapping on a few
+    acupressure points while you say words that name what you feel and slowly
+    soften it. Press play and follow along, tapping each point as it's named - or
+    just read the words. For reflection and wellbeing, not medical treatment.
+  </div>
+
+  <div id="list"></div>
+
+  <footer class="note">
+    For fun and reflection, not diagnosis. Nothing here is saved or sent.
+    <br><a class="backlink" href="index.html">&larr; Back to Growth</a>
+  </footer>
+</div>
+
+<script src="tapping-journeys.js"></script>
+<script>
+  const list = document.getElementById('list');
+  const journeys = window.TAPPING_JOURNEYS || [];
+
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // Lightly render a bracketed script .md into readable HTML.
+  function renderScript(md){
+    const out = [];
+    for (const raw of md.split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line) continue;
+      if (line === '⸻') { out.push('<hr class="rule">'); continue; }
+      if (line.startsWith('## ')) { out.push(`<p class="ln cue">${esc(line.slice(3))}</p>`); continue; }
+      if (line.startsWith('# ')) { out.push(`<p class="ln title">${esc(line.slice(2))}</p>`); continue; }
+      if (/^ROUND\b/i.test(line)) { out.push(`<p class="round">${esc(line)}</p>`); continue; }
+      const b = line.match(/^\[(.+)\]$/);
+      if (b) {
+        const inner = b[1];
+        const isPoint = /^(side of hand|eyebrow|side of eye|under eye|under nose|chin|collarbone|under arm|top of head)$/i.test(inner.trim());
+        out.push(`<p class="ln ${isPoint ? 'point' : 'cue'}">${esc(inner)}</p>`);
+        continue;
+      }
+      out.push(`<p class="ln">${esc(line)}</p>`);
+    }
+    return out.join('');
+  }
+
+  journeys.forEach((j) => {
+    const card = document.createElement('div');
+    card.className = 'panel journey';
+    card.innerHTML = `
+      <p class="sub">${esc(j.subtitle || '')}</p>
+      <h3>${esc(j.title)}</h3>
+      <p class="blurb">${esc(j.blurb || '')}</p>
+      <div class="audio-slot"></div>
+      <details class="script">
+        <summary>Read the words</summary>
+        <div class="script-body">Loading…</div>
+      </details>`;
+    list.appendChild(card);
+
+    // Audio: show a player if the MP3 exists, otherwise a gentle "coming soon".
+    const slot = card.querySelector('.audio-slot');
+    const audioSrc = `audio/${j.slug}.mp3`;
+    fetch(audioSrc, { method: 'HEAD' })
+      .then((r) => {
+        if (r.ok) slot.innerHTML = `<audio controls preload="none" src="${audioSrc}"></audio>`;
+        else slot.innerHTML = `<p class="pending">Voiceover coming soon - read the words below for now.</p>`;
+      })
+      .catch(() => { slot.innerHTML = `<audio controls preload="none" src="${audioSrc}"></audio>`; });
+
+    // Script: lazy-load the .md the first time the section is opened.
+    const details = card.querySelector('details.script');
+    const body = card.querySelector('.script-body');
+    let loaded = false;
+    details.addEventListener('toggle', () => {
+      if (!details.open || loaded) return;
+      loaded = true;
+      fetch(`scripts/${j.slug}.md`)
+        .then((r) => r.ok ? r.text() : Promise.reject())
+        .then((md) => { body.innerHTML = renderScript(md); })
+        .catch(() => { body.innerHTML = '<p class="ln cue">Could not load the script.</p>'; });
+    });
+  });
+</script>
+</body>
+</html>

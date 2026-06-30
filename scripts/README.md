@@ -107,3 +107,16 @@ Each script in the table is its own ~5,000-word / 20-round journey.)_
 
 Each file is self-contained. Start with whichever name matches how you feel right
 now — there's no order you're meant to follow.
+
+---
+
+## Listen, and the website
+
+These journeys are published on the Growth site at **`tapping.html`** (linked
+from the home page), where each one can be played as audio or read.
+
+- **Audio** is rendered with `tools/speechify-tts.mjs`, which turns the bracketed
+  scripts into Speechify SSML (pauses → real `<break>`s; point names and breath
+  cues stay spoken) and calls the Speechify TTS API. See `tools/README.md`.
+- **Making a new one** end to end — topic → brainstorm → script → voiceover →
+  published page — is what the **`/eft-journey`** skill does.
